@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 04 — Hard Life Realities | SOULQUEST</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Space+Mono:wght@400;700&family=Fraunces:ital,wght@0,100;0,900;1,700&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#f5f0e8;--surface:#ffffff;--surface2:#fff8ee;--ink:#1a1207;--ink2:#4a3f2f;--accent1:#ff4d1c;--accent2:#ffd600;--accent3:#00c896;--accent4:#7c3aed;--accent5:#ff6b9d;--border:#1a1207;--radius:20px;--transition:cubic-bezier(0.34,1.56,0.64,1);--card-h:500px}
+  [data-theme="dark"]{--bg:#0e0c09;--surface:#1c1812;--surface2:#251f14;--ink:#f5f0e8;--ink2:#c8b89a;--accent1:#ff6040;--accent2:#ffe040;--accent3:#00e8a8;--accent4:#a855f7;--accent5:#ff80b0;--border:#f5f0e8}
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Space Mono',monospace;background:var(--bg);color:var(--ink);overflow-x:hidden;transition:background .4s,color .4s}
+  body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:1;opacity:0.5}
+  .cursor{position:fixed;width:20px;height:20px;border:2px solid var(--accent4);border-radius:50%;pointer-events:none;z-index:99999;transform:translate(-50%,-50%);mix-blend-mode:multiply}
+  [data-theme="dark"] .cursor{mix-blend-mode:screen}
+  .cursor-dot{position:fixed;width:6px;height:6px;background:var(--accent4);border-radius:50%;pointer-events:none;z-index:99999;transform:translate(-50%,-50%)}
+  .cursor.hover{width:40px;height:40px}
+  .dm-toggle{width:44px;height:24px;background:var(--ink);border-radius:12px;cursor:pointer;border:none;display:flex;align-items:center;padding:3px;transition:background .3s;flex-shrink:0}
+  .dm-toggle::after{content:'';width:18px;height:18px;background:var(--bg);border-radius:50%;transition:transform .3s var(--transition)}
+  [data-theme="dark"] .dm-toggle::after{transform:translateX(20px)}
+  nav{position:sticky;top:0;z-index:100;padding:0 clamp(16px,4vw,40px);border-bottom:2px solid var(--border);background:var(--bg);display:flex;align-items:center;justify-content:space-between;min-height:60px;gap:16px;transition:background .4s}
+  .nav-logo{font-family:'Fraunces',serif;font-weight:900;font-size:clamp(16px,4vw,22px);text-decoration:none;color:var(--ink);flex-shrink:0}
+  .nav-right{display:flex;align-items:center;gap:12px}
+  .nav-links{display:flex;gap:clamp(10px,2vw,20px);align-items:center}
+  .nav-link{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--ink2);text-decoration:none;transition:color .2s;white-space:nowrap}
+  .nav-link:hover,.nav-link.active{color:var(--accent4)}
+  .nav-burger{display:none;flex-direction:column;justify-content:center;gap:5px;width:36px;height:36px;cursor:pointer;background:transparent;border:none;padding:7px;flex-shrink:0}
+  .nav-burger span{display:block;width:100%;height:2px;background:var(--ink);border-radius:2px;transition:transform .3s,opacity .3s}
+  .nav-burger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+  .nav-burger.open span:nth-child(2){opacity:0}
+  .nav-burger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+  .nav-mobile{display:none;position:absolute;top:100%;left:0;right:0;background:var(--bg);border-bottom:2px solid var(--border);padding:8px clamp(16px,4vw,40px) 16px;flex-direction:column;z-index:99;transition:background .4s}
+  .nav-mobile.open{display:flex}
+  .nav-mobile .nav-link{font-size:12px;letter-spacing:2px;padding:14px 0;border-bottom:1px solid var(--border);white-space:normal}
+  .nav-mobile .nav-link:last-child{border-bottom:none}
+  @media(max-width:680px){.nav-links{display:none}.nav-burger{display:flex}}
+  .page-hero{padding:60px 40px;background:linear-gradient(135deg,var(--accent4)22,var(--accent1)11,transparent 70%);border-bottom:2px solid var(--border);position:relative;z-index:2}
+  /* THEME SELECTOR */
+  .theme-tabs{display:flex;gap:0;border-bottom:2px solid var(--border);position:sticky;top:65px;z-index:90;background:var(--bg);overflow-x:auto;transition:background .4s}
+  .theme-tab{padding:14px 22px;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;border:none;background:transparent;color:var(--ink2);cursor:pointer;border-right:2px solid var(--border);border-bottom:4px solid transparent;white-space:nowrap;transition:all .2s}
+  .theme-tab.active{color:var(--ink);border-bottom-color:var(--accent4);background:var(--surface2)}
+  /* CONTENT */
+  .theme-panel{display:none;padding:48px 40px;border-bottom:2px solid var(--border);position:relative;z-index:2}
+  .theme-panel.visible{display:block}
+  .theme-title{font-family:'Fraunces',serif;font-weight:900;font-size:clamp(28px,5vw,56px);margin-bottom:8px}
+  .theme-sub{font-size:13px;color:var(--ink2);max-width:800px;line-height:1.9;margin-bottom:32px}
+  /* CAROUSEL */
+  .carousel-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+  .level-label{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--ink2);margin-bottom:8px}
+  .carousel-nav{display:flex;gap:8px;align-items:center}
+  .carousel-btn{width:36px;height:36px;border-radius:50%;border:2px solid var(--border);background:var(--surface);color:var(--ink);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .2s var(--transition)}
+  .carousel-btn:hover{background:var(--ink);color:var(--bg)}
+  .carousel-counter{font-size:11px;letter-spacing:2px;color:var(--ink2);padding:0 6px}
+  .carousel-track-wrap{overflow:hidden;border-radius:var(--radius);border:2px solid var(--border)}
+  .carousel-track{display:flex;transition:transform .5s cubic-bezier(0.25,0.46,0.45,0.94)}
+  .q-card{min-width:100%;height:var(--card-h);background:var(--surface);padding:32px;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden}
+  .q-card-inner{overflow-y:auto;flex:1;margin-bottom:12px;padding-right:4px}
+  .q-card-inner::-webkit-scrollbar{width:3px}
+  .q-card-inner::-webkit-scrollbar-thumb{background:var(--accent4);border-radius:3px}
+  .level-chip{display:inline-block;padding:4px 12px;border-radius:100px;font-size:10px;letter-spacing:3px;text-transform:uppercase;font-weight:700;margin-bottom:12px}
+  .l-surf{background:#6ee7b7;color:#064e3b}
+  .l-story{background:#fcd34d;color:#78350f}
+  .l-scrip{background:#a5b4fc;color:#312e81}
+  .l-truth{background:#f87171;color:#7f1d1d}
+  .l-prac{background:#34d399;color:#064e3b}
+  .q-num{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--ink2);margin-bottom:8px}
+  .q-text{font-family:'Fraunces',serif;font-style:italic;font-size:clamp(17px,2.8vw,26px);font-weight:700;line-height:1.35;color:var(--ink)}
+  .q-footer{display:flex;align-items:center;justify-content:space-between;padding-top:12px;border-top:1px solid var(--border);flex-shrink:0}
+  .q-tag{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--ink2)}
+  .q-btn{padding:8px 18px;border-radius:100px;border:2px solid var(--border);background:transparent;color:var(--ink);font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;cursor:pointer;transition:all .2s var(--transition)}
+  .q-btn:hover{background:var(--accent4);color:#fff;border-color:var(--accent4)}
+  /* LEVEL TABS */
+  .level-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+  .level-btn{padding:8px 16px;border-radius:100px;border:2px solid var(--border);background:var(--surface);font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;color:var(--ink2);transition:all .2s}
+  .level-btn.active{background:var(--ink);color:var(--bg)}
+  /* CORE IDEA BOX */
+  .core-box{padding:24px 28px;border:2px solid var(--border);border-radius:var(--radius);background:var(--surface);max-width:900px;margin-bottom:28px}
+  .core-title{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--ink2);margin-bottom:12px}
+  .core-text{font-size:13px;line-height:1.9;color:var(--ink2)}
+  .core-text strong{color:var(--ink)}
+  /* WILDCARD */
+  .wildcard-box{margin-top:24px;padding:24px;border:2px dashed var(--accent4);border-radius:var(--radius);background:var(--surface2)}
+  .wildcard-title{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--accent4);margin-bottom:12px;font-weight:700}
+  .wildcard-item{font-size:13px;line-height:1.8;color:var(--ink2);padding:6px 0;border-bottom:1px solid var(--border)}
+  /* CROSS-TOPIC CARDS */
+  .cross-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin-top:20px}
+  .cross-card{padding:20px;border:2px solid var(--border);border-radius:var(--radius);background:var(--surface)}
+  .cross-card-title{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--accent4);margin-bottom:12px;font-weight:700}
+  .cross-q{font-size:12px;line-height:1.7;color:var(--ink2);padding:5px 0;border-bottom:1px solid var(--surface2)}
+</style>
+</head>
+<body>
+<div class="cursor" id="cursor"></div>
+<div class="cursor-dot" id="cursorDot"></div>
+<nav>
+  <a href="index.html" class="nav-logo">SOULQUEST</a>
+  <div class="nav-right">
+    <div class="nav-links">
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="level1.html" class="nav-link">Module 01</a>
+      <a href="audit.html" class="nav-link">Module 02</a>
+      <a href="playbook.html" class="nav-link">Module 03</a>
+      <a href="hardlife.html" class="nav-link active">Module 04</a>
+      <a href="cards.html" class="nav-link">Module 05</a>
+    </div>
+    <button class="dm-toggle" id="dmToggle" aria-label="Toggle dark mode"></button>
+    <button class="nav-burger" id="navBurger" aria-label="Toggle menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <div class="nav-mobile" id="navMobile">
+    <a href="index.html" class="nav-link">Home</a>
+    <a href="level1.html" class="nav-link">Module 01</a>
+    <a href="audit.html" class="nav-link">Module 02</a>
+    <a href="playbook.html" class="nav-link">Module 03</a>
+    <a href="hardlife.html" class="nav-link active">Module 04</a>
+    <a href="cards.html" class="nav-link">Module 05</a>
+  </div>
+</nav>
+
+<div class="page-hero">
+  <span style="font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--accent4)">★ Module 04 · Hard Life Realities ★</span>
+  <h1 style="font-family:'Fraunces',serif;font-weight:900;font-size:clamp(40px,8vw,90px);line-height:0.9;margin-top:12px;margin-bottom:20px">HARD<br>LIFE</h1>
+  <p style="font-size:13px;color:var(--ink2);max-width:700px;line-height:1.8">Built around <strong>8 hard human realities</strong>: addiction, family wounds, work, illness, singleness, aging, creation care, and spiritual abuse. The goal is not to give cliché Christian answers, but to help people <em>tell the truth before God</em>, understand Scripture more deeply, and ask better questions in real life.</p>
+  <div style="margin-top:20px;padding:16px 20px;border:2px solid var(--border);border-radius:var(--radius);background:var(--surface);max-width:700px;font-size:13px;line-height:1.7;color:var(--ink2)">
+    The Bible does not treat people as "just sinners who need to try harder." It sees humans as <strong>embodied, wounded, desiring, relational, cultural, spiritual beings</strong> who need redemption, community, wisdom, repentance, and grace.
+  </div>
+</div>
+
+<div class="theme-tabs" id="themeTabs">
+  <button class="theme-tab active" data-theme-id="addiction">⛓ Addiction</button>
+  <button class="theme-tab" data-theme-id="family">👨‍👩‍👧 Family Trauma</button>
+  <button class="theme-tab" data-theme-id="work">💼 Work & Calling</button>
+  <button class="theme-tab" data-theme-id="illness">🤒 Chronic Illness</button>
+  <button class="theme-tab" data-theme-id="single">💫 Singleness</button>
+  <button class="theme-tab" data-theme-id="abuse">⚠️ Spiritual Abuse</button>
+  <button class="theme-tab" data-theme-id="cross">🌐 Cross-Topic Cards</button>
+  <button class="theme-tab" data-theme-id="anchors">⚓ Theo. Anchors</button>
+</div>
+
+<!-- ADDICTION -->
+<div class="theme-panel visible" id="panel-addiction">
+  <h2 class="theme-title">Addiction & Recovery</h2>
+  <p class="theme-sub">The Bible understands addiction before modern psychology had the vocabulary for it. Scripture uses words like <strong>slavery, bondage, idolatry, desire, flesh, captivity, and false worship</strong>. Romans 7 is painfully honest: "I do not do what I want, but I do the very thing I hate." That is one of the most psychologically accurate descriptions of bondage in Scripture.</p>
+  <div class="core-box">
+    <div class="core-title">Key Biblical Themes</div>
+    <div class="core-text">
+      <strong>Addiction as slavery:</strong> Sin is not only something we choose; over time, it can become something that masters us. Jesus says, "Everyone who practices sin is a slave to sin" in John 8.<br><br>
+      <strong>Addiction as misplaced worship:</strong> The addicted heart often asks a substance, habit, person, screen, fantasy, achievement, or pleasure to do what only God can do: soothe, save, secure, or satisfy.<br><br>
+      <strong>Addiction as counterfeit refuge:</strong> Many addictions are not just about pleasure. They are about pain management.<br><br>
+      <strong>Willpower is insufficient:</strong> The Bible does not say, "Try harder and you will be free." It says freedom comes through truth, grace, the Spirit, confession, community, renewal of the mind, and embodied obedience.<br><br>
+      <strong>What Christians Often Get Wrong:</strong> Many churches reduce addiction to "lack of discipline." That misses how addiction rewires habits, shame, secrecy, body, memory, and desire. The biblical view is more complex: humans are both <strong>responsible</strong> and <strong>enslaved</strong>, both <strong>sinners</strong> and <strong>sufferers</strong>.
+    </div>
+  </div>
+
+  <div class="level-tabs" id="add-level-tabs">
+    <button class="level-btn active" data-level="surf">L1 Surface</button>
+    <button class="level-btn" data-level="story">L2 Story</button>
+    <button class="level-btn" data-level="scrip">L3 Scripture</button>
+    <button class="level-btn" data-level="truth">L4 Truth-Telling</button>
+    <button class="level-btn" data-level="prac">L5 Practice</button>
+  </div>
+
+  <div class="carousel-header">
+    <span style="font-family:'Fraunces',serif;font-weight:700;font-size:20px">Questions</span>
+    <div class="carousel-nav"><button class="carousel-btn" id="add-prev">←</button><span class="carousel-counter" id="add-count">1 / 5</span><button class="carousel-btn" id="add-next">→</button></div>
+  </div>
+  <div class="carousel-track-wrap"><div class="carousel-track" id="add-track"></div></div>
+
+  <div class="wildcard-box">
+    <div class="wildcard-title">🃏 Wildcards</div>
+    <div class="wildcard-item">Text one trusted person: "I need accountability, not judgment."</div>
+    <div class="wildcard-item">Write down the sentence your addiction tells you. Then write a biblical truth beside it.</div>
+    <div class="wildcard-item">Remove one source of access for 24 hours.</div>
+    <div class="wildcard-item">Pray Psalm 51 slowly, but replace vague words with specific truth.</div>
+    <div class="wildcard-item">Make a relapse map: trigger → emotion → lie → behavior → consequence → better response.</div>
+  </div>
+  <div style="margin-top:20px;padding:16px 20px;border-left:4px solid var(--accent4);background:var(--surface2);border-radius:0 12px 12px 0;font-size:13px;line-height:1.7;color:var(--ink2)"><strong>Bottom Line:</strong> Biblical recovery is not "try harder." It is <em>come into the light, receive grace, break agreement with lies, rebuild desire, and walk with others toward freedom</em>.</div>
+</div>
+
+<!-- FAMILY TRAUMA -->
+<div class="theme-panel" id="panel-family">
+  <h2 class="theme-title">Parenting & Generational Trauma</h2>
+  <p class="theme-sub">The Bible is brutally honest about family systems. Genesis is not filled with perfect families. It shows favoritism, sibling rivalry, deception, abuse, infertility grief, parental failure, inheritance conflict, sexual violence, exile, and reconciliation. The Bible teaches that sin can travel through generations, but it does <strong>not</strong> teach fatalism. What is inherited can be interrupted.</p>
+  <div class="core-box">
+    <div class="core-title">Key Biblical Themes</div>
+    <div class="core-text">
+      <strong>Generational patterns are real:</strong> Abraham lies. Isaac repeats similar patterns. Jacob deceives and is deceived. Favoritism passes from one generation to another.<br><br>
+      <strong>But guilt is not automatically inherited:</strong> Ezekiel 18 strongly rejects the idea that children are morally guilty for their parents' sins.<br><br>
+      <strong>The cycle can stop:</strong> Repentance, truth, justice, forgiveness, lament, boundaries, and new obedience can interrupt family curses.<br><br>
+      <strong>Parenting is discipleship, not ownership:</strong> Children are not extensions of parental ego. They are entrusted to parents by God.<br><br>
+      <strong>What Christians Often Get Wrong:</strong> Some Christians use "honor your father and mother" to silence victims. That is spiritual misuse. Biblical honor does not require enabling abuse, denying truth, or destroying oneself to preserve a family image.
+    </div>
+  </div>
+
+  <div class="level-tabs" id="fam-level-tabs">
+    <button class="level-btn active" data-level="surf">L1 Surface</button>
+    <button class="level-btn" data-level="story">L2 Story</button>
+    <button class="level-btn" data-level="scrip">L3 Scripture</button>
+    <button class="level-btn" data-level="truth">L4 Truth-Telling</button>
+    <button class="level-btn" data-level="prac">L5 Practice</button>
+  </div>
+  <div class="carousel-header">
+    <span style="font-family:'Fraunces',serif;font-weight:700;font-size:20px">Questions</span>
+    <div class="carousel-nav"><button class="carousel-btn" id="fam2-prev">←</button><span class="carousel-counter" id="fam2-count">1 / 5</span><button class="carousel-btn" id="fam2-next">→</button></div>
+  </div>
+  <div class="carousel-track-wrap"><div class="carousel-track" id="fam2-track"></div></div>
+
+  <div class="wildcard-box">
+    <div class="wildcard-title">🃏 Wildcards</div>
+    <div class="wildcard-item">Write two lists: "What I inherited" and "What stops with me."</div>
+    <div class="wildcard-item">Ask an older relative one non-accusatory question about family history.</div>
+    <div class="wildcard-item">Practice this sentence: "I can honor you without obeying unhealthy patterns."</div>
+    <div class="wildcard-item">Pray a lament for your family line.</div>
+    <div class="wildcard-item">Bless the next generation out loud, even if you do not have children.</div>
+  </div>
+  <div style="margin-top:20px;padding:16px 20px;border-left:4px solid var(--accent4);background:var(--surface2);border-radius:0 12px 12px 0;font-size:13px;line-height:1.7;color:var(--ink2)"><strong>Bottom Line:</strong> The Bible does not deny family trauma. It shows that sin travels through families, but <em>grace can travel further</em>.</div>
+</div>
+
+<!-- WORK & CALLING -->
+<div class="theme-panel" id="panel-work">
+  <h2 class="theme-title">Work, Vocation & Calling</h2>
+  <p class="theme-sub">Work existed before the fall. In Genesis 2, Adam is placed in the garden "to work it and keep it." That means work is not a curse. Frustration, exploitation, futility, and toil are affected by the fall, but work itself is part of human dignity. The Bible does not divide life into "spiritual work" and "secular work" as sharply as many Christians do.</p>
+  <div class="core-box">
+    <div class="core-title">Key Biblical Themes</div>
+    <div class="core-text">
+      <strong>Work is creation participation:</strong> Humans cultivate what God made. We organize, heal, build, teach, design, repair, farm, cook, code, clean, govern, parent, and create.<br><br>
+      <strong>Work is neighbor-love:</strong> Good work serves real human needs.<br><br>
+      <strong>Work is not identity:</strong> Your job matters, but it is not your savior.<br><br>
+      <strong>Calling is broader than career:</strong> Calling includes holiness, love, church, family, justice, service, and faithfulness in your actual season.<br><br>
+      <strong>Rest is resistance:</strong> Sabbath reminds us that we are not machines, slaves, or gods.
+    </div>
+  </div>
+
+  <div class="level-tabs" id="wk-level-tabs">
+    <button class="level-btn active" data-level="surf">L1 Surface</button>
+    <button class="level-btn" data-level="story">L2 Story</button>
+    <button class="level-btn" data-level="scrip">L3 Scripture</button>
+    <button class="level-btn" data-level="truth">L4 Truth-Telling</button>
+    <button class="level-btn" data-level="prac">L5 Practice</button>
+  </div>
+  <div class="carousel-header">
+    <span style="font-family:'Fraunces',serif;font-weight:700;font-size:20px">Questions</span>
+    <div class="carousel-nav"><button class="carousel-btn" id="wk2-prev">←</button><span class="carousel-counter" id="wk2-count">1 / 5</span><button class="carousel-btn" id="wk2-next">→</button></div>
+  </div>
+  <div class="carousel-track-wrap"><div class="carousel-track" id="wk2-track"></div></div>
+
+  <div class="wildcard-box">
+    <div class="wildcard-title">🃏 Wildcards</div>
+    <div class="wildcard-item">Write a prayer for your actual job, not your dream job.</div>
+    <div class="wildcard-item">Thank someone whose work usually goes unnoticed.</div>
+    <div class="wildcard-item">Take one Sabbath block without productivity guilt.</div>
+    <div class="wildcard-item">Identify one workplace idol: approval, money, status, control, indispensability.</div>
+    <div class="wildcard-item">Ask: "How does my work love my neighbor?"</div>
+  </div>
+  <div style="margin-top:20px;padding:16px 20px;border-left:4px solid var(--accent4);background:var(--surface2);border-radius:0 12px 12px 0;font-size:13px;line-height:1.7;color:var(--ink2)"><strong>Bottom Line:</strong> Your work is not your god, but it can become an altar where ordinary faithfulness is offered to God.</div>
+</div>
+
+<!-- CHRONIC ILLNESS -->
+<div class="theme-panel" id="panel-illness">
+  <h2 class="theme-title">Chronic Illness & Disability</h2>
+  <p class="theme-sub">The Bible does not give shallow answers to bodily suffering. Job, the Psalms, Ecclesiastes, Paul's thorn in the flesh, the man born blind in John 9, and Jesus in Gethsemane all resist easy explanations. Sometimes God heals. Sometimes God strengthens. Sometimes God feels silent. Sometimes the miracle is not cure, but presence, endurance, community, and dignity.</p>
+  <div class="core-box">
+    <div class="core-title">Key Biblical Themes</div>
+    <div class="core-text">
+      <strong>The body matters:</strong> Christianity is not anti-body. The resurrection affirms embodied hope.<br><br>
+      <strong>Suffering is not always punishment:</strong> John 9 directly challenges the assumption that disability must be caused by personal or parental sin.<br><br>
+      <strong>Lament is faithful:</strong> The Psalms teach believers to bring complaint, confusion, and grief to God.<br><br>
+      <strong>What Christians Often Get Wrong:</strong> Some Christians imply that if healing does not happen, the person lacks faith. That is cruel and unbiblical. Others treat disabled people as inspirational props. Biblical dignity means people with illness or disability are not projects, lessons, burdens, or proof-texts. They are image-bearers.
+    </div>
+  </div>
+
+  <div class="level-tabs" id="ill-level-tabs">
+    <button class="level-btn active" data-level="surf">L1 Surface</button>
+    <button class="level-btn" data-level="story">L2 Story</button>
+    <button class="level-btn" data-level="scrip">L3 Scripture</button>
+    <button class="level-btn" data-level="truth">L4 Truth-Telling</button>
+    <button class="level-btn" data-level="prac">L5 Practice</button>
+  </div>
+  <div class="carousel-header">
+    <span style="font-family:'Fraunces',serif;font-weight:700;font-size:20px">Questions</span>
+    <div class="carousel-nav"><button class="carousel-btn" id="ill-prev">←</button><span class="carousel-counter" id="ill-count">1 / 5</span><button class="carousel-btn" id="ill-next">→</button></div>
+  </div>
+  <div class="carousel-track-wrap"><div class="carousel-track" id="ill-track"></div></div>
+
+  <div class="wildcard-box">
+    <div class="wildcard-title">🃏 Wildcards</div>
+    <div class="wildcard-item">Write your own lament Psalm: complaint, request, trust, unresolved ending allowed.</div>
+    <div class="wildcard-item">Ask someone suffering: "What is helpful, and what is not helpful?"</div>
+    <div class="wildcard-item">Remove one shame-based sentence from your vocabulary.</div>
+    <div class="wildcard-item">Practice saying: "My limits are real, and I am still loved."</div>
+    <div class="wildcard-item">Make one space more accessible for someone else.</div>
+  </div>
+  <div style="margin-top:20px;padding:16px 20px;border-left:4px solid var(--accent4);background:var(--surface2);border-radius:0 12px 12px 0;font-size:13px;line-height:1.7;color:var(--ink2)"><strong>Bottom Line:</strong> God's silence in suffering is not proof of His absence. But the Bible gives us permission to grieve, protest, wait, and hope without pretending pain is simple.</div>
+</div>
+
+<!-- SINGLENESS -->
+<div class="theme-panel" id="panel-single">
+  <h2 class="theme-title">Singleness & Celibacy</h2>
+  <p class="theme-sub">In many cultures, marriage is treated as adulthood, success, and social completion. Paul radically challenges this. In 1 Corinthians 7, singleness is not second-class. It is a genuine gift with unique freedom for devotion to God. Jesus Himself was single. Paul was likely single. The highest human life ever lived was not married.</p>
+  <div class="core-box">
+    <div class="core-title">Key Biblical Themes</div>
+    <div class="core-text">
+      <strong>Marriage is good, but not ultimate:</strong> The Bible honors marriage but does not worship it.<br><br>
+      <strong>Singleness is not failure:</strong> Paul describes singleness as a gift, not a waiting room.<br><br>
+      <strong>Celibacy is embodied discipleship:</strong> It is not repression when freely offered to God; it is disciplined love.<br><br>
+      <strong>Church must become family:</strong> If the church idolizes the nuclear family, single people become socially homeless.<br><br>
+      <strong>What Christians Often Get Wrong:</strong> Churches often say "singleness is a gift" while structuring everything around married couples and families. Another error is treating single people as incomplete, immature, suspicious, or endlessly available for church labor.
+    </div>
+  </div>
+
+  <div class="level-tabs" id="sin-level-tabs">
+    <button class="level-btn active" data-level="surf">L1 Surface</button>
+    <button class="level-btn" data-level="story">L2 Story</button>
+    <button class="level-btn" data-level="scrip">L3 Scripture</button>
+    <button class="level-btn" data-level="truth">L4 Truth-Telling</button>
+    <button class="level-btn" data-level="prac">L5 Practice</button>
+  </div>
+  <div class="carousel-header">
+    <span style="font-family:'Fraunces',serif;font-weight:700;font-size:20px">Questions</span>
+    <div class="carousel-nav"><button class="carousel-btn" id="sin-prev">←</button><span class="carousel-counter" id="sin-count">1 / 5</span><button class="carousel-btn" id="sin-next">→</button></div>
+  </div>
+  <div class="carousel-track-wrap"><div class="carousel-track" id="sin-track"></div></div>
+
+  <div class="wildcard-box">
+    <div class="wildcard-title">🃏 Wildcards</div>
+    <div class="wildcard-item">Invite a single person to your table, not as a charity project, but as family.</div>
+    <div class="wildcard-item">Name one assumption you hold about single adults that may not be biblical.</div>
+    <div class="wildcard-item">Practice saying: "My relational status does not define my completeness in Christ."</div>
+    <div class="wildcard-item">Identify one way you have made single people feel like they are waiting for real life to begin.</div>
+    <div class="wildcard-item">Read 1 Corinthians 7 slowly and mark every verse that surprised you.</div>
+  </div>
+  <div style="margin-top:20px;padding:16px 20px;border-left:4px solid var(--accent4);background:var(--surface2);border-radius:0 12px 12px 0;font-size:13px;line-height:1.7;color:var(--ink2)"><strong>Bottom Line:</strong> Singleness is not second-class Christianity. It is a valid, dignified, full expression of life in Christ — and the church must learn to honor it structurally, not just verbally.</div>
+</div>
+
+<!-- SPIRITUAL ABUSE -->
+<div class="theme-panel" id="panel-abuse">
+  <h2 class="theme-title">Spiritual Abuse & Church Hurt</h2>
+  <p class="theme-sub">Spiritual abuse is not just "church hurt." It is the misuse of spiritual authority, Scripture, community, or God's name to control, silence, manipulate, exploit, or harm people. It can happen in any tradition — evangelical, charismatic, Catholic, mainline, or progressive. Jesus was his most severe toward religious leaders who harmed the people entrusted to their care (Matthew 23; Ezekiel 34).</p>
+  <div class="core-box">
+    <div class="core-title">Spiritual Abuse Can Look Like:</div>
+    <div class="core-text">
+      "Touch not the Lord's anointed" used to avoid accountability · Public shaming disguised as discipline · Leaders demanding unquestioned obedience · Pressuring people to serve while burned out · Using prophecy or "God told me" to control decisions · Covering up sexual, financial, emotional, or pastoral misconduct · Treating questions as disloyalty · Forcing reconciliation without repentance · Making people dependent on a leader instead of Christ · Weaponizing Scripture against the wounded
+    </div>
+  </div>
+
+  <div class="level-tabs" id="abu-level-tabs">
+    <button class="level-btn active" data-level="surf">L1 Surface</button>
+    <button class="level-btn" data-level="story">L2 Story</button>
+    <button class="level-btn" data-level="scrip">L3 Scripture</button>
+    <button class="level-btn" data-level="truth">L4 Truth-Telling</button>
+    <button class="level-btn" data-level="prac">L5 Practice</button>
+  </div>
+  <div class="carousel-header">
+    <span style="font-family:'Fraunces',serif;font-weight:700;font-size:20px">Questions</span>
+    <div class="carousel-nav"><button class="carousel-btn" id="abu-prev">←</button><span class="carousel-counter" id="abu-count">1 / 5</span><button class="carousel-btn" id="abu-next">→</button></div>
+  </div>
+  <div class="carousel-track-wrap"><div class="carousel-track" id="abu-track"></div></div>
+
+  <div class="wildcard-box">
+    <div class="wildcard-title">🃏 Wildcards</div>
+    <div class="wildcard-item">Write two columns: "God's voice" and "the abusive voice." Separate them.</div>
+    <div class="wildcard-item">Read Ezekiel 34 and underline what God says He will do for the sheep.</div>
+    <div class="wildcard-item">Practice saying: "Accountability is not rebellion."</div>
+    <div class="wildcard-item">Name one spiritual practice you can reclaim safely.</div>
+    <div class="wildcard-item">Reach out to a trauma-informed pastor, counselor, or mature believer.</div>
+  </div>
+  <div style="margin-top:20px;padding:16px 20px;border-left:4px solid var(--accent4);background:var(--surface2);border-radius:0 12px 12px 0;font-size:13px;line-height:1.7;color:var(--ink2)"><strong>Bottom Line:</strong> Spiritual abuse is not just "church hurt." It is a violation of sacred trust. God does not side with image-protecting systems; He sides with truth, justice, repentance, and wounded sheep.</div>
+</div>
+
+<!-- CROSS-TOPIC CARDS -->
+<div class="theme-panel" id="panel-cross">
+  <h2 class="theme-title">Cross-Topic Master Cards</h2>
+  <p class="theme-sub">These cards work across all 8 themes. They cut to the heart regardless of which specific hard reality you're navigating.</p>
+  <div class="cross-grid">
+    <div class="cross-card">
+      <div class="cross-card-title">🪪 Identity Cards</div>
+      <div class="cross-q">What part of your life are you most tempted to make your identity?</div>
+      <div class="cross-q">Where do you feel most ashamed to be human?</div>
+      <div class="cross-q">What would change if you believed you were loved before you improved?</div>
+      <div class="cross-q">What label have people placed on you that God may not have given you?</div>
+      <div class="cross-q">Where are you performing strength instead of receiving grace?</div>
+    </div>
+    <div class="cross-card">
+      <div class="cross-card-title">👨‍👩‍👧 Family & Culture Cards</div>
+      <div class="cross-q">What did your culture teach you to hide?</div>
+      <div class="cross-q">What did your family reward: honesty, achievement, obedience, image, sacrifice, silence?</div>
+      <div class="cross-q">What is considered "normal" in your environment but may not be biblical?</div>
+      <div class="cross-q">What do you need to unlearn from your upbringing?</div>
+      <div class="cross-q">What good inheritance do you want to preserve?</div>
+    </div>
+    <div class="cross-card">
+      <div class="cross-card-title">💔 Pain Cards</div>
+      <div class="cross-q">What pain have you minimized because others had it worse?</div>
+      <div class="cross-q">What grief has no public ceremony in your life?</div>
+      <div class="cross-q">What prayer have you stopped praying?</div>
+      <div class="cross-q">Where do you feel disappointed with God?</div>
+      <div class="cross-q">What would lament sound like if you stopped editing yourself?</div>
+    </div>
+    <div class="cross-card">
+      <div class="cross-card-title">🔄 Repentance Cards</div>
+      <div class="cross-q">What are you calling a personality trait that may actually be sin?</div>
+      <div class="cross-q">What are you calling wisdom that may actually be fear?</div>
+      <div class="cross-q">What are you calling sacrifice that may actually be people-pleasing?</div>
+      <div class="cross-q">What are you calling loyalty that may actually be avoidance?</div>
+      <div class="cross-q">What are you calling faith that may actually be denial?</div>
+    </div>
+    <div class="cross-card">
+      <div class="cross-card-title">🌅 Hope Cards</div>
+      <div class="cross-q">What small sign of grace have you overlooked?</div>
+      <div class="cross-q">Who has been a picture of God's kindness to you?</div>
+      <div class="cross-q">What is not healed yet, but is no longer hidden?</div>
+      <div class="cross-q">What would faithfulness look like in the next 24 hours?</div>
+      <div class="cross-q">What kind of person is suffering forming in you?</div>
+    </div>
+  </div>
+</div>
+
+<!-- THEOLOGICAL ANCHORS -->
+<div class="theme-panel" id="panel-anchors">
+  <h2 class="theme-title">Theological Anchors</h2>
+  <p class="theme-sub">These six foundations ground everything in the Hard Life Playbook — and in the entire SoulQuest experience.</p>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;margin-top:20px">
+    <div style="padding:24px;border:2px solid var(--border);border-radius:var(--radius);background:var(--surface)">
+      <div style="font-size:32px;margin-bottom:12px">📖</div>
+      <div style="font-family:'Fraunces',serif;font-weight:900;font-size:20px;margin-bottom:10px">1. The Bible is honest about human complexity</div>
+      <p style="font-size:13px;line-height:1.7;color:var(--ink2)">People are not only minds. They are bodies, families, histories, habits, desires, wounds, and worshipers.</p>
+    </div>
+    <div style="padding:24px;border:2px solid var(--border);border-radius:var(--radius);background:var(--surface)">
+      <div style="font-size:32px;margin-bottom:12px">⚖️</div>
+      <div style="font-family:'Fraunces',serif;font-weight:900;font-size:20px;margin-bottom:10px">2. Sin is personal and systemic</div>
+      <p style="font-size:13px;line-height:1.7;color:var(--ink2)">The Bible addresses individual choices, family patterns, unjust systems, corrupt leaders, exploitative economies, and damaged creation.</p>
+    </div>
+    <div style="padding:24px;border:2px solid var(--border);border-radius:var(--radius);background:var(--surface)">
+      <div style="font-size:32px;margin-bottom:12px">🕊️</div>
+      <div style="font-family:'Fraunces',serif;font-weight:900;font-size:20px;margin-bottom:10px">3. Grace is not denial</div>
+      <p style="font-size:13px;line-height:1.7;color:var(--ink2)">Grace tells the truth. It does not minimize harm, excuse abuse, or rush healing.</p>
+    </div>
+    <div style="padding:24px;border:2px solid var(--border);border-radius:var(--radius);background:var(--surface)">
+      <div style="font-size:32px;margin-bottom:12px">🤝</div>
+      <div style="font-family:'Fraunces',serif;font-weight:900;font-size:20px;margin-bottom:10px">4. Healing is usually communal</div>
+      <p style="font-size:13px;line-height:1.7;color:var(--ink2)">Confession, repentance, restoration, accountability, grief, and endurance happen best in wise community.</p>
+    </div>
+    <div style="padding:24px;border:2px solid var(--border);border-radius:var(--radius);background:var(--surface)">
+      <div style="font-size:32px;margin-bottom:12px">🫀</div>
+      <div style="font-family:'Fraunces',serif;font-weight:900;font-size:20px;margin-bottom:10px">5. The body matters</div>
+      <p style="font-size:13px;line-height:1.7;color:var(--ink2)">Addiction, illness, aging, sex, work, disability, rest, and environment all remind us that Christianity is not disembodied spirituality.</p>
+    </div>
+    <div style="padding:24px;border:2px solid var(--border);border-radius:var(--radius);background:var(--surface);background:linear-gradient(135deg,var(--surface),var(--surface2))">
+      <div style="font-size:32px;margin-bottom:12px">🌅</div>
+      <div style="font-family:'Fraunces',serif;font-weight:900;font-size:20px;margin-bottom:10px">6. Hope is not optimism</div>
+      <p style="font-size:13px;line-height:1.7;color:var(--ink2)">Biblical hope is not "everything is fine." It is trust in God while telling the truth about what is not fine.</p>
+    </div>
+  </div>
+</div>
+
+<div style="padding:60px 40px;border-top:2px solid var(--border);background:var(--ink);color:var(--bg);position:relative;z-index:2;overflow:hidden">
+  <div style="position:absolute;inset:0;background:radial-gradient(ellipse 40% 60% at 100% 50%,var(--accent4)22,transparent)"></div>
+  <div style="max-width:700px;margin:0 auto;text-align:center;position:relative">
+    <div style="font-size:40px;margin-bottom:16px">🏁</div>
+    <h2 style="font-family:'Fraunces',serif;font-weight:900;font-size:clamp(24px,4vw,40px);margin-bottom:20px">Final Bottom Line</h2>
+    <p style="font-size:15px;line-height:1.9;color:#c8b89a">The Bible is not shallow about real life. It understands bondage, family wounds, work, suffering, singleness, aging, creation, and religious harm with more honesty than many churches do. A mature Christian life is not about pretending everything is okay; it is about bringing everything into the light of God's truth, grace, justice, and redemption.</p>
+    <div style="margin-top:32px;display:flex;gap:16px;justify-content:center;flex-wrap:wrap">
+      <a href="cards.html" style="padding:14px 28px;background:var(--accent4);color:#fff;border-radius:100px;text-decoration:none;font-size:12px;letter-spacing:2px;text-transform:uppercase;font-family:'Space Mono',monospace">Module 05: Cards →</a>
+      <a href="index.html" style="padding:14px 28px;border:2px solid var(--bg);border-radius:100px;text-decoration:none;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--bg);font-family:'Space Mono',monospace">Home</a>
+    </div>
+  </div>
+</div>
+
+<script>
+const cursor=document.getElementById('cursor'),dot=document.getElementById('cursorDot');
+let mx=0,my=0,cx=0,cy=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;dot.style.left=mx+'px';dot.style.top=my+'px'});
+(function anim(){cx+=(mx-cx)*0.15;cy+=(my-cy)*0.15;cursor.style.left=cx+'px';cursor.style.top=cy+'px';requestAnimationFrame(anim)})();
+document.querySelectorAll('a,button').forEach(el=>{el.addEventListener('mouseenter',()=>cursor.classList.add('hover'));el.addEventListener('mouseleave',()=>cursor.classList.remove('hover'))});
+const dm=document.getElementById('dmToggle');
+document.documentElement.setAttribute('data-theme',localStorage.getItem('sq-theme')||'light');
+dm.onclick=()=>{const t=document.documentElement.getAttribute('data-theme')==='light'?'dark':'light';document.documentElement.setAttribute('data-theme',t);localStorage.setItem('sq-theme',t)};
+// NAV BURGER
+const burger=document.getElementById('navBurger'),mobileNav=document.getElementById('navMobile');if(burger&&mobileNav){burger.addEventListener('click',()=>{const o=mobileNav.classList.toggle('open');burger.classList.toggle('open');burger.setAttribute('aria-expanded',o)});mobileNav.querySelectorAll('.nav-link').forEach(l=>l.addEventListener('click',()=>{mobileNav.classList.remove('open');burger.classList.remove('open');burger.setAttribute('aria-expanded',false)}))}
+
+// THEME TABS
+document.querySelectorAll('.theme-tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    document.querySelectorAll('.theme-tab').forEach(t=>t.classList.remove('active'));
+    tab.classList.add('active');
+    document.querySelectorAll('.theme-panel').forEach(p=>p.classList.remove('visible'));
+    const p=document.getElementById('panel-'+tab.dataset.themeId);
+    if(p)p.classList.add('visible');
+    playClick();
+  });
+});
+
+// QUESTION DATA PER THEME & LEVEL
+const allQs={
+  addiction:{
+    surf:["What is one habit people casually joke about that may actually be controlling them?","What do people your age use to numb themselves?","When life feels overwhelming, what do you instinctively reach for?","What is a 'socially acceptable addiction' in your culture?","What is something people call 'self-care' that may actually be avoidance?"],
+    story:["When did you first learn to hide pain instead of expressing it?","What did your family teach you about weakness?","What emotion do you find hardest to sit with?","Have you ever felt controlled by something you also loved?","What habit has cost you more than you expected?"],
+    scrip:["When Paul says, 'I do what I hate,' where do you see yourself in that?","What false promise does your strongest temptation make to you?","What would it mean for Jesus to be your refuge, not just your forgiver?","Where do you need truth, not just motivation?","What does freedom look like if it is more than 'not doing the thing'?"],
+    truth:["What are you afraid would happen if you stopped numbing?","What do you protect more than your freedom?","Who benefits from you staying ashamed and silent?","What lie do you believe right before you give in?","What part of you still wants slavery because slavery feels familiar?"],
+    prac:["Who is one safe person you could tell the truth to?","What boundary needs to become physical, not just mental?","What trigger do you need to name honestly?","What replacement practice could help your body learn peace?","What would repentance look like this week without self-hatred?"]
+  },
+  family:{
+    surf:["What family phrase did you hear growing up that still lives in your head?","What did your family do well that you want to keep?","What is one thing your family avoided talking about?","What emotion was most acceptable in your home?","What emotion was least welcome?"],
+    story:["When did you first feel responsible for someone else's emotions?","What did love look like in your family: affection, duty, money, sacrifice, control, silence, correction?","What kind of apology did you see growing up?","What family pattern do you fear repeating?","What did your parents give you that they probably never received themselves?"],
+    scrip:["Which Genesis family story feels most realistic to you?","What does Ezekiel 18 teach about responsibility and hope?","How does Jesus redefine family around obedience to God, not bloodline alone?","What does biblical honor look like when a parent has caused harm?","What does forgiveness not mean?"],
+    truth:["What are you still calling 'normal' because it was normal at home?","What pain did your family spiritualize instead of healing?","What boundary feels disloyal but may actually be wise?","What would you need to grieve before you can forgive honestly?","What family role are you tired of playing?"],
+    prac:["What is one sentence you want to stop passing down?","What is one practice you want your future family to inherit?","Who do you need to stop rescuing?","What apology do you need to give without explaining yourself?","What truth needs to be spoken gently but clearly?"]
+  },
+  work:{
+    surf:["What job do people underestimate but society deeply needs?","What kind of work gives you energy?","What kind of work drains your soul?","What did your culture teach you about 'successful' work?","What is one job you respect more now than you used to?"],
+    story:["When did you first connect your worth to performance?","What did your parents model about work?","Have you ever felt ashamed of your job or salary?","What workplace wound still affects you?","What task makes you feel quietly faithful?"],
+    scrip:["What changes when work is seen as worship?","How does Sabbath challenge modern hustle culture?","What does Colossians 3 mean when it says to work 'as for the Lord'?","How can ambition become idolatry?","What would Jesus care about in your workplace?"],
+    truth:["Are you working from love, fear, pride, survival, or calling?","Who are you becoming because of your work?","What compromise have you normalized?","What success would damage your soul?","What would you do differently if your title could not define you?"],
+    prac:["What is one act of hidden faithfulness you can offer to God this week?","Where do you need to practice Sabbath?","Who at work needs dignity from you?","What boundary would protect your soul?","What skill could you develop as an act of stewardship?"]
+  },
+  illness:{
+    surf:["What kind of suffering do people misunderstand most?","What is one phrase people say to suffering people that is not helpful?","What does your culture assume about healthy bodies?","When have you felt limited by your body?","What does rest feel like to you: gift, guilt, weakness, or relief?"],
+    story:["When has your body felt like a betrayal?","Have you ever felt unseen because your pain was invisible?","What did suffering teach you that success never could?","What have you lost that others may not recognize as grief?","When did someone's presence help more than their advice?"],
+    scrip:["What does Job teach us about bad explanations?","What does John 9 challenge about blame?","What does Jesus' suffering body reveal about God?","How do the lament Psalms give permission to be honest?","What does resurrection hope mean when healing does not come now?"],
+    truth:["Are you angry at God? What would it sound like if you told Him honestly?","What kind of healing are you secretly afraid to hope for?","What part of your identity feels threatened by weakness?","Where have people spiritualized your pain instead of sitting with you?","What do you need to stop pretending is okay?"],
+    prac:["What support do you need to ask for without apologizing?","What expectation needs to be adjusted in this season?","What would it mean to honor your body today?","Who needs to listen instead of fixing?","What prayer can you pray when you cannot pray 'big' prayers?"]
+  },
+  single:{
+    surf:["What messages did you absorb about marriage growing up?","What do people assume about single adults?","What is one freedom single people may have that married people forget?","What is one loneliness single people may experience that others minimize?","What does your church or culture celebrate more: marriage or faithfulness?"],
+    story:["When did you first feel like singleness was a problem to be solved?","Have you ever felt invisible or sidelined in a faith community because of your relational status?","What does loneliness actually feel like for you?","What have you learned about yourself through singleness that you could not have learned otherwise?","Who has modeled faithful singleness for you?"],
+    scrip:["What does Paul actually say about singleness in 1 Corinthians 7?","What does it mean that Jesus was single?","What would it mean for the church to be your primary family?","What does chastity actually mean — beyond just abstinence?","How does the resurrection change how we view marriage and singleness?"],
+    truth:["Are you waiting for 'real life' to begin after marriage?","What wounds have shaped your view of relationships?","Are you lonely, or do you need community — and are you pursuing it?","Where have you felt that your singleness makes you less than?","What story have you told yourself about why you're single?"],
+    prac:["What does it mean to be fruitful and faithful in your current season?","What community do you need to build or join?","What gift or calling can you pursue more freely because of your current season?","Who needs you to show up for them this week?","What would it look like to stop waiting and start living?"]
+  },
+  abuse:{
+    surf:["What makes a spiritual leader trustworthy?","What is the difference between conviction and manipulation?","What kind of church culture feels unsafe?","What phrases are often used to silence people?","Why do people stay in unhealthy religious environments?"],
+    story:["Have you ever felt afraid to ask honest questions in a faith setting?","When has religious language been used to pressure you?","What kind of authority did you grow up trusting or fearing?","Have you ever confused busyness in church with closeness to God?","What spiritual wound is hard for you to explain to people who were not there?"],
+    scrip:["What does Ezekiel 34 reveal about God's heart toward abused sheep?","Why is Jesus so severe toward hypocritical religious leaders?","What does servant leadership actually require?","How should Matthew 18 be used carefully, not weaponized?","What does biblical submission never mean?"],
+    truth:["Are you protecting peace, or are you protecting image?","What question were you taught not to ask?","What leader did you give power they should not have had?","Where did you call fear 'discernment' or control 'covering'?","What would justice require, not just forgiveness language?"],
+    prac:["What boundary do you need with a religious authority or institution?","Who can help you process without minimizing your experience?","What Scripture needs to be reread without the abuser's voice attached to it?","What evidence, documentation, or support is needed if harm occurred?","What would healing look like if it did not require pretending nothing happened?"]
+  }
+};
+
+// Build level-based carousels
+function buildLevelCarousel(themeKey, trackId, prevId, nextId, countId, levelTabsId) {
+  let currentLevel='surf';
+  const track=document.getElementById(trackId);
+  const prev=document.getElementById(prevId);
+  const next=document.getElementById(nextId);
+  const count=document.getElementById(countId);
+  const levelTabs=document.getElementById(levelTabsId);
+  if(!track||!prev||!next)return;
+
+  const levelColors={surf:'l-surf',story:'l-story',scrip:'l-scrip',truth:'l-truth',prac:'l-prac'};
+  const levelNames={surf:'Level 1 — Surface',story:'Level 2 — Story',scrip:'Level 3 — Scripture',truth:'Level 4 — Truth-Telling',prac:'Level 5 — Practice'};
+
+  let idx=0;
+
+  function renderLevel(level) {
+    currentLevel=level;
+    idx=0;
+    track.innerHTML='';
+    const qs=(allQs[themeKey]||{})[level]||[];
+    const cls=levelColors[level]||'l-surf';
+    qs.forEach((q,i)=>{
+      const el=document.createElement('div');
+      el.className='q-card';
+      el.innerHTML=`<div class="q-card-inner"><span class="level-chip ${cls}">${levelNames[level]}</span><div class="q-num">Question ${i+1} of ${qs.length}</div><div class="q-text">"${q}"</div></div><div class="q-footer"><span class="q-tag">#${themeKey} #${level}</span><button class="q-btn" onclick="playBing()">Sit With This ✶</button></div>`;
+      track.appendChild(el);
+    });
+    track.style.transform='translateX(0)';
+    if(count)count.textContent=`1 / ${qs.length}`;
+  }
+
+  renderLevel('surf');
+  prev.onclick=()=>{
+    const qs=(allQs[themeKey]||{})[currentLevel]||[];
+    idx=(idx-1+qs.length)%qs.length;
+    track.style.transform=`translateX(-${idx*100}%)`;
+    if(count)count.textContent=`${idx+1} / ${qs.length}`;
+    playClick();
+  };
+  next.onclick=()=>{
+    const qs=(allQs[themeKey]||{})[currentLevel]||[];
+    idx=(idx+1)%qs.length;
+    track.style.transform=`translateX(-${idx*100}%)`;
+    if(count)count.textContent=`${idx+1} / ${qs.length}`;
+    playClick();
+  };
+
+  if(levelTabs){
+    levelTabs.querySelectorAll('.level-btn').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        levelTabs.querySelectorAll('.level-btn').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        renderLevel(btn.dataset.level);
+        playClick();
+      });
+    });
+  }
+}
+
+buildLevelCarousel('addiction','add-track','add-prev','add-next','add-count','add-level-tabs');
+buildLevelCarousel('family','fam2-track','fam2-prev','fam2-next','fam2-count','fam-level-tabs');
+buildLevelCarousel('work','wk2-track','wk2-prev','wk2-next','wk2-count','wk-level-tabs');
+buildLevelCarousel('illness','ill-track','ill-prev','ill-next','ill-count','ill-level-tabs');
+buildLevelCarousel('single','sin-track','sin-prev','sin-next','sin-count','sin-level-tabs');
+buildLevelCarousel('abuse','abu-track','abu-prev','abu-next','abu-count','abu-level-tabs');
+
+var audioCtx;
+function playClick(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.connect(g);g.connect(audioCtx.destination);o.frequency.setValueAtTime(500,audioCtx.currentTime);o.frequency.exponentialRampToValueAtTime(200,audioCtx.currentTime+0.07);g.gain.setValueAtTime(0.06,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.07);o.start();o.stop(audioCtx.currentTime+0.07)}
+function playBing(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.connect(g);g.connect(audioCtx.destination);o.type='sine';o.frequency.setValueAtTime(528,audioCtx.currentTime);o.frequency.exponentialRampToValueAtTime(792,audioCtx.currentTime+0.2);g.gain.setValueAtTime(0.07,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.5);o.start();o.stop(audioCtx.currentTime+0.5)}
+</script>
+</body>
+</html>

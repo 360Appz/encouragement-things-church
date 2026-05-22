@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 05 — Rapid Fire Deck | SOULQUEST</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Space+Mono:wght@400;700&family=Fraunces:ital,wght@0,100;0,900;1,700&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#f5f0e8;--surface:#ffffff;--surface2:#fff8ee;--ink:#1a1207;--ink2:#4a3f2f;--accent1:#ff4d1c;--accent2:#ffd600;--accent3:#00c896;--accent4:#7c3aed;--accent5:#ff6b9d;--border:#1a1207;--radius:20px;--transition:cubic-bezier(0.34,1.56,0.64,1)}
+  [data-theme="dark"]{--bg:#0e0c09;--surface:#1c1812;--surface2:#251f14;--ink:#f5f0e8;--ink2:#c8b89a;--accent1:#ff6040;--accent2:#ffe040;--accent3:#00e8a8;--accent4:#a855f7;--accent5:#ff80b0;--border:#f5f0e8}
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Space Mono',monospace;background:var(--bg);color:var(--ink);overflow-x:hidden;transition:background .4s,color .4s}
+  body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:1;opacity:0.5}
+  .cursor{position:fixed;width:20px;height:20px;border:2px solid var(--accent5);border-radius:50%;pointer-events:none;z-index:99999;transform:translate(-50%,-50%);mix-blend-mode:multiply;transition:width .12s,height .12s}
+  [data-theme="dark"] .cursor{mix-blend-mode:screen}
+  .cursor-dot{position:fixed;width:6px;height:6px;background:var(--accent5);border-radius:50%;pointer-events:none;z-index:99999;transform:translate(-50%,-50%)}
+  .cursor.hover{width:44px;height:44px}
+  .dm-toggle{width:44px;height:24px;background:var(--ink);border-radius:12px;cursor:pointer;border:none;display:flex;align-items:center;padding:3px;transition:background .3s;flex-shrink:0}
+  .dm-toggle::after{content:'';width:18px;height:18px;background:var(--bg);border-radius:50%;transition:transform .3s var(--transition)}
+  [data-theme="dark"] .dm-toggle::after{transform:translateX(20px)}
+  nav{position:sticky;top:0;z-index:100;padding:0 clamp(16px,4vw,40px);border-bottom:2px solid var(--border);background:var(--bg);display:flex;align-items:center;justify-content:space-between;min-height:60px;gap:16px;transition:background .4s}
+  .nav-logo{font-family:'Fraunces',serif;font-weight:900;font-size:clamp(16px,4vw,22px);text-decoration:none;color:var(--ink);flex-shrink:0}
+  .nav-right{display:flex;align-items:center;gap:12px}
+  .nav-links{display:flex;gap:clamp(10px,2vw,20px);align-items:center}
+  .nav-link{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--ink2);text-decoration:none;transition:color .2s;white-space:nowrap}
+  .nav-link:hover,.nav-link.active{color:var(--accent5)}
+  .nav-burger{display:none;flex-direction:column;justify-content:center;gap:5px;width:36px;height:36px;cursor:pointer;background:transparent;border:none;padding:7px;flex-shrink:0}
+  .nav-burger span{display:block;width:100%;height:2px;background:var(--ink);border-radius:2px;transition:transform .3s,opacity .3s}
+  .nav-burger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+  .nav-burger.open span:nth-child(2){opacity:0}
+  .nav-burger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+  .nav-mobile{display:none;position:absolute;top:100%;left:0;right:0;background:var(--bg);border-bottom:2px solid var(--border);padding:8px clamp(16px,4vw,40px) 16px;flex-direction:column;z-index:99;transition:background .4s}
+  .nav-mobile.open{display:flex}
+  .nav-mobile .nav-link{font-size:12px;letter-spacing:2px;padding:14px 0;border-bottom:1px solid var(--border);white-space:normal}
+  .nav-mobile .nav-link:last-child{border-bottom:none}
+  @media(max-width:680px){.nav-links{display:none}.nav-burger{display:flex}}
+  /* HERO */
+  .page-hero{padding:60px 40px;background:linear-gradient(135deg,var(--accent5)22,var(--accent2)11,transparent 70%);border-bottom:2px solid var(--border);position:relative;z-index:2}
+  /* MODE TABS */
+  .mode-tabs{display:flex;gap:0;border-bottom:2px solid var(--border);position:sticky;top:65px;z-index:90;background:var(--bg);overflow-x:auto;transition:background .4s}
+  .mode-tab{padding:16px 28px;font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;border:none;background:transparent;color:var(--ink2);cursor:pointer;border-right:2px solid var(--border);border-bottom:4px solid transparent;white-space:nowrap;transition:all .2s}
+  .mode-tab.active{color:var(--ink);border-bottom-color:var(--accent5);background:var(--surface2)}
+  /* PANELS */
+  .mode-panel{display:none;padding:48px 40px;position:relative;z-index:2}
+  .mode-panel.visible{display:block}
+  /* QOTD */
+  .qotd-card{min-height:340px;border:3px solid var(--border);border-radius:var(--radius);background:var(--surface);padding:48px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:8px 8px 0 var(--border);max-width:800px;position:relative;overflow:hidden}
+  .qotd-card::before{content:'';position:absolute;top:0;left:0;right:0;height:6px;background:linear-gradient(90deg,var(--accent1),var(--accent2),var(--accent3),var(--accent4),var(--accent5))}
+  .qotd-tag{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--ink2);margin-bottom:16px}
+  .qotd-q{font-family:'Fraunces',serif;font-style:italic;font-size:clamp(22px,4vw,36px);font-weight:700;line-height:1.3;color:var(--ink);margin-bottom:24px}
+  .qotd-verse{border-left:4px solid var(--accent2);padding:12px 16px;font-family:'Fraunces',serif;font-style:italic;font-size:14px;line-height:1.6;color:var(--ink2);background:var(--surface2);border-radius:0 8px 8px 0;margin-bottom:20px}
+  /* RAPID FIRE */
+  .rf-card{min-height:400px;border:3px solid var(--border);border-radius:var(--radius);background:var(--surface);padding:48px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;box-shadow:8px 8px 0 var(--border);max-width:700px;cursor:pointer;transition:transform .2s var(--transition);position:relative;overflow:hidden}
+  .rf-card:hover{transform:translate(-4px,-4px);box-shadow:12px 12px 0 var(--border)}
+  .rf-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--accent5)11,transparent 60%)}
+  .rf-q{font-family:'Fraunces',serif;font-style:italic;font-size:clamp(20px,4vw,34px);font-weight:700;line-height:1.3;color:var(--ink);position:relative}
+  .rf-tap{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--ink2);margin-top:24px;position:relative}
+  /* RAPID FIRE CONTROLS */
+  .rf-controls{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:32px;align-items:center}
+  .rf-btn{padding:12px 24px;border-radius:100px;border:2px solid var(--border);background:var(--surface);color:var(--ink);font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .2s var(--transition)}
+  .rf-btn:hover,.rf-btn.active-mode{background:var(--ink);color:var(--bg)}
+  .rf-timer{font-family:'Fraunces',serif;font-weight:900;font-size:48px;color:var(--accent1);min-width:80px;text-align:center}
+  .rf-count{font-size:11px;letter-spacing:2px;color:var(--ink2);padding:0 8px}
+  /* WILDCARD DRAW */
+  .wc-stage{min-height:300px;border:3px solid var(--border);border-radius:var(--radius);background:var(--surface);padding:40px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;box-shadow:6px 6px 0 var(--border);max-width:600px;position:relative;overflow:hidden;cursor:pointer;transition:all .3s var(--transition)}
+  .wc-stage:hover{transform:translate(-3px,-3px);box-shadow:9px 9px 0 var(--border)}
+  .wc-icon{font-size:60px;margin-bottom:20px;animation:spin 3s linear infinite}
+  @keyframes spin{0%,100%{transform:rotate(-5deg) scale(1)}50%{transform:rotate(5deg) scale(1.05)}}
+  .wc-name{font-family:'Fraunces',serif;font-weight:900;font-size:clamp(24px,4vw,40px);margin-bottom:16px;color:var(--ink)}
+  .wc-action{font-size:14px;line-height:1.8;color:var(--ink2);max-width:500px}
+  /* QUOTE MACHINE */
+  .qm-card{min-height:280px;border:3px solid var(--border);border-radius:var(--radius);background:var(--ink);color:var(--bg);padding:48px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:8px 8px 0 var(--border);max-width:800px;position:relative;overflow:hidden;cursor:pointer;transition:all .3s var(--transition)}
+  .qm-card:hover{transform:translate(-4px,-4px);box-shadow:12px 12px 0 var(--border)}
+  .qm-card::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 100% 0%,var(--accent5)33,transparent)}
+  .qm-quote{font-family:'Fraunces',serif;font-style:italic;font-size:clamp(18px,3vw,28px);font-weight:700;line-height:1.4;color:var(--bg);position:relative}
+  .qm-attr{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--accent2);position:relative;margin-top:20px}
+  .qm-tap{font-size:10px;letter-spacing:2px;color:#888;position:relative;margin-top:12px}
+  /* STATS */
+  .stats-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:32px}
+  .stat-chip{padding:8px 20px;border-radius:100px;border:2px solid var(--border);background:var(--surface);font-size:12px;letter-spacing:1px;color:var(--ink2)}
+  .stat-chip span{font-weight:700;color:var(--accent1)}
+</style>
+</head>
+<body>
+<div class="cursor" id="cursor"></div>
+<div class="cursor-dot" id="cursorDot"></div>
+<nav>
+  <a href="index.html" class="nav-logo">SOULQUEST</a>
+  <div class="nav-right">
+    <div class="nav-links">
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="level1.html" class="nav-link">Module 01</a>
+      <a href="audit.html" class="nav-link">Module 02</a>
+      <a href="playbook.html" class="nav-link">Module 03</a>
+      <a href="hardlife.html" class="nav-link">Module 04</a>
+      <a href="cards.html" class="nav-link active">Module 05</a>
+    </div>
+    <button class="dm-toggle" id="dmToggle" aria-label="Toggle dark mode"></button>
+    <button class="nav-burger" id="navBurger" aria-label="Toggle menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <div class="nav-mobile" id="navMobile">
+    <a href="index.html" class="nav-link">Home</a>
+    <a href="level1.html" class="nav-link">Module 01</a>
+    <a href="audit.html" class="nav-link">Module 02</a>
+    <a href="playbook.html" class="nav-link">Module 03</a>
+    <a href="hardlife.html" class="nav-link">Module 04</a>
+    <a href="cards.html" class="nav-link active">Module 05</a>
+  </div>
+</nav>
+
+<div class="page-hero">
+  <span style="font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--accent5)">★ Module 05 · Rapid Fire Deck ★</span>
+  <h1 style="font-family:'Fraunces',serif;font-weight:900;font-size:clamp(40px,8vw,90px);line-height:0.9;margin-top:12px;margin-bottom:20px">RAPID<br>FIRE</h1>
+  <p style="font-size:13px;color:var(--ink2);max-width:700px;line-height:1.8">Question of the Day. Rapid Fire mode. Wildcard draw. Quote machine. Every question from all 4 playbooks, daily-shuffled. Play solo or with friends.</p>
+  <div class="stats-row" style="margin-top:24px">
+    <div class="stat-chip">📖 <span>200+</span> Questions</div>
+    <div class="stat-chip">🎴 <span>31</span> Cards</div>
+    <div class="stat-chip">⚡ <span>5</span> Modes</div>
+    <div class="stat-chip">🔁 <span>Daily</span> Shuffle</div>
+  </div>
+</div>
+
+<div class="mode-tabs">
+  <button class="mode-tab active" data-mode="qotd">📅 Q of the Day</button>
+  <button class="mode-tab" data-mode="rapid">⚡ Rapid Fire</button>
+  <button class="mode-tab" data-mode="wildcard">🃏 Wildcard Draw</button>
+  <button class="mode-tab" data-mode="quote">💬 Quote Machine</button>
+  <button class="mode-tab" data-mode="browse">🔍 Browse All</button>
+</div>
+
+<!-- Q OF THE DAY -->
+<div class="mode-panel visible" id="panel-qotd">
+  <div style="margin-bottom:24px">
+    <span style="font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--ink2)">★ Today's Question ★</span>
+    <h2 style="font-family:'Fraunces',serif;font-weight:900;font-size:36px;margin-top:8px">Question of the Day</h2>
+    <p style="font-size:13px;color:var(--ink2);margin-top:6px">Fresh every day. Date-seeded so you and a friend can discuss the same question.</p>
+  </div>
+  <div class="qotd-card">
+    <div>
+      <div class="qotd-tag" id="qotd-tag">Today's Question</div>
+      <div class="qotd-q" id="qotd-q">Loading...</div>
+      <div class="qotd-verse" id="qotd-verse" style="display:none"></div>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding-top:20px;border-top:1px solid var(--border)">
+      <span style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--ink2)" id="qotd-source">Source</span>
+      <button onclick="showNextQotd()" style="padding:10px 22px;border-radius:100px;border:2px solid var(--border);background:transparent;color:var(--ink);font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;cursor:pointer;transition:all .2s">Next ✶</button>
+    </div>
+  </div>
+  <div style="margin-top:20px;padding:16px 20px;border:2px solid var(--border);border-radius:var(--radius);background:var(--surface);max-width:800px;font-size:13px;line-height:1.7;color:var(--ink2)">
+    💡 <strong>How to use:</strong> Read the question slowly. Sit with it for 60 seconds before answering. Journal your response. Or share it with someone and take turns. The question changes daily — come back tomorrow.
+  </div>
+</div>
+
+<!-- RAPID FIRE -->
+<div class="mode-panel" id="panel-rapid">
+  <div style="margin-bottom:24px">
+    <h2 style="font-family:'Fraunces',serif;font-weight:900;font-size:36px;margin-bottom:8px">⚡ Rapid Fire Mode</h2>
+    <p style="font-size:13px;color:var(--ink2)">Tap the card to get the next question. Set a timer and go. Perfect for groups.</p>
+  </div>
+  <div class="rf-controls">
+    <button class="rf-btn active-mode" id="rf-start-btn" onclick="startRapidFire()">▶ Start</button>
+    <button class="rf-btn" onclick="stopRapidFire()">■ Stop</button>
+    <div class="rf-timer" id="rf-timer">—</div>
+    <span class="rf-count" id="rf-count-display">0 questions answered</span>
+  </div>
+  <div class="rf-card" id="rf-card" onclick="nextRapidQuestion()">
+    <div class="rf-q" id="rf-q">Tap to begin ⚡</div>
+    <div class="rf-tap">tap for next question</div>
+  </div>
+  <div style="margin-top:16px;font-size:12px;color:var(--ink2)">💡 Tip: Use 30-second or 60-second answers. No need to explain everything — just say the first honest thing that comes to mind.</div>
+</div>
+
+<!-- WILDCARD DRAW -->
+<div class="mode-panel" id="panel-wildcard">
+  <div style="margin-bottom:24px">
+    <h2 style="font-family:'Fraunces',serif;font-weight:900;font-size:36px;margin-bottom:8px">🃏 Wildcard Draw</h2>
+    <p style="font-size:13px;color:var(--ink2)">Draw a random wildcard action. Do it today. All wildcards from all 4 modules.</p>
+  </div>
+  <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px">
+    <button class="rf-btn" onclick="drawWildcard()">🎴 Draw a Card</button>
+    <button class="rf-btn" onclick="shuffleWildcards()">🔀 Shuffle Deck</button>
+  </div>
+  <div class="wc-stage" id="wc-stage" onclick="drawWildcard()">
+    <div class="wc-icon" id="wc-icon">🃏</div>
+    <div class="wc-name" id="wc-name">Tap to Draw</div>
+    <div class="wc-action" id="wc-action">Draw a wildcard and receive your challenge for today.</div>
+  </div>
+  <div style="margin-top:16px;font-size:12px;color:var(--ink2)">💡 Wildcards are meant to be done, not just read. Pick one and commit to it today.</div>
+</div>
+
+<!-- QUOTE MACHINE -->
+<div class="mode-panel" id="panel-quote">
+  <div style="margin-bottom:24px">
+    <h2 style="font-family:'Fraunces',serif;font-weight:900;font-size:36px;margin-bottom:8px">💬 Quote Machine</h2>
+    <p style="font-size:13px;color:var(--ink2)">Verses, insights, and wisdom from across the playbooks. Tap for a new one.</p>
+  </div>
+  <div class="qm-card" id="qm-card" onclick="nextQuote()">
+    <div class="qm-quote" id="qm-quote">Loading wisdom...</div>
+    <div>
+      <div class="qm-attr" id="qm-attr">—</div>
+      <div class="qm-tap">tap for next quote</div>
+    </div>
+  </div>
+  <div style="margin-top:20px;display:flex;gap:12px;flex-wrap:wrap">
+    <button class="rf-btn" onclick="nextQuote()">Next Quote →</button>
+    <button class="rf-btn" onclick="shareQuote()">Share ↗</button>
+  </div>
+</div>
+
+<!-- BROWSE ALL -->
+<div class="mode-panel" id="panel-browse">
+  <div style="margin-bottom:24px">
+    <h2 style="font-family:'Fraunces',serif;font-weight:900;font-size:36px;margin-bottom:8px">🔍 Browse All Questions</h2>
+    <p style="font-size:13px;color:var(--ink2)">All 200+ questions from every module, organized by category. Filter by theme.</p>
+  </div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px" id="browse-filters">
+    <button class="rf-btn active-mode" data-filter="all" onclick="filterBrowse('all',this)">All</button>
+    <button class="rf-btn" data-filter="identity" onclick="filterBrowse('identity',this)">Identity</button>
+    <button class="rf-btn" data-filter="emotions" onclick="filterBrowse('emotions',this)">Emotions</button>
+    <button class="rf-btn" data-filter="relationships" onclick="filterBrowse('relationships',this)">Relationships</button>
+    <button class="rf-btn" data-filter="work" onclick="filterBrowse('work',this)">Work</button>
+    <button class="rf-btn" data-filter="money" onclick="filterBrowse('money',this)">Money</button>
+    <button class="rf-btn" data-filter="c1" onclick="filterBrowse('c1',this)">Playbook 1–15</button>
+    <button class="rf-btn" data-filter="c2" onclick="filterBrowse('c2',this)">Audit 16–31</button>
+    <button class="rf-btn" data-filter="hardlife" onclick="filterBrowse('hardlife',this)">Hard Life</button>
+  </div>
+  <div id="browse-list" style="display:flex;flex-direction:column;gap:8px;max-height:600px;overflow-y:auto;padding-right:4px"></div>
+</div>
+
+<div style="padding:40px;border-top:2px solid var(--border);background:var(--surface2);position:relative;z-index:2;font-size:13px;line-height:1.7;color:var(--ink2)">
+  <div style="max-width:800px">
+    <strong>📅 Information current as of May 2026.</strong> Scripture references from NIV unless otherwise noted. Questions drawn from c1.txt (Cards 1–15), c2.txt (Cards 16–31), gp1.txt (Deep Dive Playbook), and gp2.txt (Hard Life Realities).
+    <div style="margin-top:16px;display:flex;gap:12px;flex-wrap:wrap">
+      <a href="index.html" style="padding:10px 20px;border:2px solid var(--border);border-radius:100px;text-decoration:none;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--ink);font-family:'Space Mono',monospace">← Home</a>
+      <a href="level1.html" style="padding:10px 20px;background:var(--accent5);border-radius:100px;text-decoration:none;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#fff;font-family:'Space Mono',monospace">Start Module 01</a>
+    </div>
+  </div>
+</div>
+
+<script>
+// CURSOR
+const cursor=document.getElementById('cursor'),dot=document.getElementById('cursorDot');
+let mx=0,my=0,cx=0,cy=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;dot.style.left=mx+'px';dot.style.top=my+'px'});
+(function anim(){cx+=(mx-cx)*0.15;cy+=(my-cy)*0.15;cursor.style.left=cx+'px';cursor.style.top=cy+'px';requestAnimationFrame(anim)})();
+document.querySelectorAll('a,button').forEach(el=>{el.addEventListener('mouseenter',()=>cursor.classList.add('hover'));el.addEventListener('mouseleave',()=>cursor.classList.remove('hover'))});
+const dm=document.getElementById('dmToggle');
+document.documentElement.setAttribute('data-theme',localStorage.getItem('sq-theme')||'light');
+dm.onclick=()=>{const t=document.documentElement.getAttribute('data-theme')==='light'?'dark':'light';document.documentElement.setAttribute('data-theme',t);localStorage.setItem('sq-theme',t)};
+// NAV BURGER
+const burger=document.getElementById('navBurger'),mobileNav=document.getElementById('navMobile');if(burger&&mobileNav){burger.addEventListener('click',()=>{const o=mobileNav.classList.toggle('open');burger.classList.toggle('open');burger.setAttribute('aria-expanded',o)});mobileNav.querySelectorAll('.nav-link').forEach(l=>l.addEventListener('click',()=>{mobileNav.classList.remove('open');burger.classList.remove('open');burger.setAttribute('aria-expanded',false)}))}
+
+// MODE TABS
+document.querySelectorAll('.mode-tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    document.querySelectorAll('.mode-tab').forEach(t=>t.classList.remove('active'));
+    tab.classList.add('active');
+    document.querySelectorAll('.mode-panel').forEach(p=>p.classList.remove('visible'));
+    document.getElementById('panel-'+tab.dataset.mode).classList.add('visible');
+    playClick();
+  });
+});
+
+// ALL QUESTIONS DATA
+const allQuestions=[
+  // C1 - Playbook Cards 1-15
+  {q:"What word do you most often use to define yourself — and does it serve you?",verse:"The Lord does not look at the things people look at. People look at the outward appearance, but the Lord looks at the heart. — 1 Samuel 16:7",tag:"c1",cat:"identity"},
+  {q:"When did you last feel like you were 'too much' or 'not enough'?",verse:"I praise you because I am fearfully and wonderfully made. — Psalm 139:14",tag:"c1",cat:"identity"},
+  {q:"Whose life do you scroll through and feel worse about your own?",verse:"Each one should test their own actions. — Galatians 6:4",tag:"c1",cat:"identity"},
+  {q:"Is there something from your past you've let define your ceiling?",verse:"The old has gone, the new is here! — 2 Corinthians 5:17",tag:"c1",cat:"identity"},
+  {q:"Is there a version of you that nobody in your life has seen?",verse:"Perfect love drives out fear. — 1 John 4:18",tag:"c1",cat:"relationships"},
+  {q:"What are you most anxious about right now — and what is that anxiety actually protecting?",verse:"Do not be anxious about anything, but in every situation present your requests to God. — Philippians 4:6",tag:"c1",cat:"emotions"},
+  {q:"Who are you still carrying resentment toward — even if you say you've forgiven them?",verse:"Forgive as the Lord forgave you. — Colossians 3:13",tag:"c1",cat:"relationships"},
+  {q:"If you're honest — do you experience God as safe? Or as a scorekeeper?",verse:"Nothing will be able to separate us from the love of God. — Romans 8:38-39",tag:"c1",cat:"identity"},
+  {q:"When do you feel most alone — even when surrounded by people?",verse:"Turn to me and be gracious to me, for I am lonely and afflicted. — Psalm 25:16",tag:"c1",cat:"emotions"},
+  {q:"What loss are you still not fully over — the one you pretend not to think about?",verse:"Jesus wept. — John 11:35",tag:"c1",cat:"emotions"},
+  {q:"If fear and money weren't factors, what would you do with your life?",verse:"For we are God's handiwork, created in Christ Jesus to do good works. — Ephesians 2:10",tag:"c1",cat:"identity"},
+  {q:"What would you do differently if you genuinely weren't afraid?",verse:"The Spirit God gave us does not make us timid, but gives us power, love and self-discipline. — 2 Timothy 1:7",tag:"c1",cat:"identity"},
+  {q:"What do you most want to be remembered for?",verse:"For I know the plans I have for you, declares the Lord. — Jeremiah 29:11",tag:"c1",cat:"identity"},
+  {q:"Has something happened to you that made you question whether God was good?",verse:"In all things God works for the good of those who love him. — Romans 8:28",tag:"c1",cat:"emotions"},
+  {q:"If you had to reduce your entire belief about yourself down to one sentence — what would it be?",verse:"You are a chosen people, a royal priesthood, a holy nation, God's special possession. — 1 Peter 2:9",tag:"c1",cat:"identity"},
+  // C2 - Critical Audit Cards 16-31
+  {q:"If someone audited your bank statements and calendar — what would they say you actually worship?",verse:"You cannot serve both God and money. — Matthew 6:24",tag:"c2",cat:"money"},
+  {q:"When did you last give something that genuinely cost you?",verse:"Whoever is kind to the poor lends to the LORD. — Proverbs 19:17",tag:"c2",cat:"money"},
+  {q:"What messages did you absorb about your body growing up — from church, family, or culture?",verse:"She is altogether beautiful, my darling; there is no flaw in you. — Song of Solomon 4:7",tag:"c2",cat:"identity"},
+  {q:"Do you feel guilty for wanting things — connection, pleasure, success, love?",verse:"Delight yourself in the Lord, and he will give you the desires of your heart. — Psalm 37:4",tag:"c2",cat:"identity"},
+  {q:"What are you angrier about than you admit to people?",verse:"In your anger do not sin. — Ephesians 4:26",tag:"c2",cat:"emotions"},
+  {q:"Whose success makes you feel smaller? Be honest.",verse:"A heart at peace gives life to the body, but envy rots the bones. — Proverbs 14:30",tag:"c2",cat:"emotions"},
+  {q:"What part of yourself do you most work to hide — even from yourself?",verse:"The heart is deceitful above all things. Who can understand it? — Jeremiah 17:9",tag:"c2",cat:"identity"},
+  {q:"When did you last truly rest — not scrolled, not 'decompressed,' but actually rested?",verse:"Come to me, all you who are weary and burdened, and I will give you rest. — Matthew 11:28",tag:"c2",cat:"emotions"},
+  {q:"Have you ever hit a wall so hard you told God you were done?",verse:"I have had enough, LORD. — 1 Kings 19:4",tag:"c2",cat:"emotions"},
+  {q:"What does your phone know about you that your closest friends don't?",verse:"You shall have no other gods before me. — Exodus 20:3",tag:"c2",cat:"identity"},
+  {q:"Have you ever been genuinely angry at God? Did you admit it?",verse:"My God, my God, why have you forsaken me? — Psalm 22:1",tag:"c2",cat:"emotions"},
+  {q:"Is there a season of your life where God felt completely absent? What happened to your faith in it?",verse:"Even though I walk through the darkest valley, I will fear no evil. — Psalm 23:4",tag:"c2",cat:"emotions"},
+  {q:"When did you last grieve something in the world that didn't directly affect you?",verse:"How long, Lord, must I call for help, but you do not listen? — Habakkuk 1:2",tag:"c2",cat:"emotions"},
+  {q:"If your political party and your Bible directly contradicted each other — which would you adjust?",verse:"Do not put your trust in princes, in human beings, who cannot save. — Psalm 146:3",tag:"c2",cat:"identity"},
+  {q:"If you died in a year, what would you stop doing? What would you start?",verse:"Teach us to number our days, that we may gain a heart of wisdom. — Psalm 90:12",tag:"c2",cat:"identity"},
+  {q:"What have you been waiting for so long you've started to doubt it will ever come?",verse:"Those who hope in the Lord will renew their strength. — Isaiah 40:31",tag:"c2",cat:"emotions"},
+  // Deep Dive - key identity questions
+  {q:"Who are you when nobody is impressed?",tag:"gp1",cat:"identity"},{q:"What identity do you keep trying to earn?",tag:"gp1",cat:"identity"},{q:"What lie about yourself have you repeated for years?",tag:"gp1",cat:"identity"},{q:"Are you living from belovedness or for validation?",tag:"gp1",cat:"identity"},{q:"Who are you becoming through your daily habits?",tag:"gp1",cat:"identity"},
+  {q:"What emotion have you been avoiding?",tag:"gp1",cat:"emotions"},{q:"What feeling do you judge yourself for having?",tag:"gp1",cat:"emotions"},{q:"What would you say to God if you knew He would not reject you?",tag:"gp1",cat:"emotions"},{q:"What is your soul tired of pretending?",tag:"gp1",cat:"emotions"},{q:"What are you carrying that was never yours to carry?",tag:"gp1",cat:"emotions"},
+  {q:"Who gets the most honest version of you?",tag:"gp1",cat:"relationships"},{q:"What do you demand from others that you rarely give?",tag:"gp1",cat:"relationships"},{q:"What pattern follows you from relationship to relationship?",tag:"gp1",cat:"relationships"},{q:"Who have you hurt but not properly apologized to?",tag:"gp1",cat:"relationships"},{q:"Do people feel safer, smaller, freer, or more anxious around you?",tag:"gp1",cat:"relationships"},
+  {q:"Are you working from calling, fear, ego, survival, or comparison?",tag:"gp1",cat:"work"},{q:"What work makes you feel alive?",tag:"gp1",cat:"work"},{q:"What gift has God given you that you keep minimizing?",tag:"gp1",cat:"work"},{q:"What would faithfulness look like in your current job?",tag:"gp1",cat:"work"},{q:"Is your ambition submitted to God or using God for approval?",tag:"gp1",cat:"work"},
+  {q:"What does money represent to you: security, freedom, status, control, comfort, or power?",tag:"gp1",cat:"money"},{q:"Are you generous when nobody knows?",tag:"gp1",cat:"money"},{q:"What does enough mean to you?",tag:"gp1",cat:"money"},{q:"What would your bank statement reveal about your worship?",tag:"gp1",cat:"money"},{q:"If God asked you to give more, what fear would surface first?",tag:"gp1",cat:"money"},
+  // Hard Life
+  {q:"What is a 'socially acceptable addiction' in your culture?",tag:"hardlife",cat:"emotions"},{q:"When did you first learn to hide pain instead of expressing it?",tag:"hardlife",cat:"emotions"},{q:"What false promise does your strongest temptation make to you?",tag:"hardlife",cat:"emotions"},{q:"What are you afraid would happen if you stopped numbing?",tag:"hardlife",cat:"emotions"},{q:"What lie do you believe right before you give in?",tag:"hardlife",cat:"emotions"},
+  {q:"What family phrase did you hear growing up that still lives in your head?",tag:"hardlife",cat:"relationships"},{q:"What are you still calling 'normal' because it was normal at home?",tag:"hardlife",cat:"relationships"},{q:"What boundary feels disloyal but may actually be wise?",tag:"hardlife",cat:"relationships"},{q:"What family role are you tired of playing?",tag:"hardlife",cat:"relationships"},
+  {q:"What job do people underestimate but society deeply needs?",tag:"hardlife",cat:"work"},{q:"When did you first connect your worth to performance?",tag:"hardlife",cat:"work"},{q:"What compromise have you normalized at work?",tag:"hardlife",cat:"work"},{q:"What success would damage your soul?",tag:"hardlife",cat:"work"},
+  {q:"What messages did you absorb about marriage growing up?",tag:"hardlife",cat:"relationships"},{q:"When did you first feel like singleness was a problem to be solved?",tag:"hardlife",cat:"relationships"},{q:"Have you ever felt afraid to ask honest questions in a faith setting?",tag:"hardlife",cat:"identity"},{q:"What question were you taught not to ask?",tag:"hardlife",cat:"identity"},
+];
+
+// SEEDED SHUFFLE
+function seedRandom(seed){let s=seed;return()=>{s=Math.sin(s)*10000;return s-Math.floor(s)};}
+function seededShuffle(arr,seed){const r=seedRandom(seed);const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+const d=new Date();
+const dailySeed=d.getFullYear()*10000+d.getMonth()*100+d.getDate();
+const hourSeed=dailySeed*100+d.getHours();
+const shuffledDaily=seededShuffle(allQuestions,dailySeed);
+const shuffledHourly=seededShuffle(allQuestions,hourSeed);
+
+// Q OF THE DAY
+let qotdIdx=0;
+const accentColors=['#ff4d1c','#ffd600','#00c896','#7c3aed','#ff6b9d'];
+function showQotd(idx){
+  const q=shuffledDaily[idx%shuffledDaily.length];
+  document.getElementById('qotd-q').textContent='"'+q.q+'"';
+  document.getElementById('qotd-source').textContent=q.tag==='c1'?'Module 01 — The Playbook':q.tag==='c2'?'Module 02 — The Audit':q.tag==='gp1'?'Module 03 — Deep Dive':'Module 04 — Hard Life';
+  document.getElementById('qotd-tag').textContent='Today\'s Question · '+new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+  if(q.verse){document.getElementById('qotd-verse').textContent=q.verse;document.getElementById('qotd-verse').style.display='block';}
+  else{document.getElementById('qotd-verse').style.display='none';}
+}
+showQotd(0);
+function showNextQotd(){qotdIdx++;showQotd(qotdIdx);playClick();}
+
+// RAPID FIRE
+let rfIdx=0,rfCount=0,rfTimer=null,rfSecs=0,rfRunning=false;
+const rfShuffled=seededShuffle(allQuestions,hourSeed);
+const rfAccents=['#ff4d1c','#ffd600','#00c896','#7c3aed','#ff6b9d'];
+function startRapidFire(){
+  if(rfRunning)return;
+  rfRunning=true;rfSecs=0;rfCount=0;rfIdx=0;
+  document.getElementById('rf-count-display').textContent='0 questions answered';
+  nextRapidQuestion();
+  rfTimer=setInterval(()=>{
+    rfSecs++;
+    const m=Math.floor(rfSecs/60),s=rfSecs%60;
+    document.getElementById('rf-timer').textContent=m+':'+(s<10?'0':'')+s;
+  },1000);
+}
+function stopRapidFire(){
+  rfRunning=false;
+  clearInterval(rfTimer);
+  document.getElementById('rf-timer').textContent='—';
+  document.getElementById('rf-q').textContent='Tap to begin ⚡';
+  playBing();
+}
+function nextRapidQuestion(){
+  if(!rfRunning){startRapidFire();return;}
+  const q=rfShuffled[rfIdx%rfShuffled.length];
+  document.getElementById('rf-q').textContent='"'+q.q+'"';
+  document.getElementById('rf-card').style.background=var_or(accentColors[rfIdx%accentColors.length]+'22','var(--surface)');
+  rfIdx++;rfCount++;
+  document.getElementById('rf-count-display').textContent=rfCount+' question'+(rfCount===1?'':'s')+' answered';
+  playClick();
+}
+function var_or(val,fallback){return val||fallback;}
+
+// WILDCARDS
+const wildcards=[
+  {name:"The Mercy Card",action:"Text someone who has hurt you: 'I'm working on forgiving what happened between us.' Don't explain. Just send it.",icon:"🕊️"},
+  {name:"The Truth Card",action:"Tell someone one thing you love about them that you've never said out loud.",icon:"💎"},
+  {name:"The Confession Card",action:"Admit one thing to yourself that you've been pretending isn't true. Write it down. Burn it. Pray it.",icon:"🔥"},
+  {name:"The Gratitude Card",action:"Name 3 things that are hard right now — then name the hidden gift in each one.",icon:"🌱"},
+  {name:"The Courage Card",action:"Do the one thing you've been avoiding for months. Today. Just start.",icon:"⚡"},
+  {name:"The Rest Card",action:"Do nothing productive for one hour. Practice being, not doing. (Psalm 46:10: 'Be still and know that I am God.')",icon:"🌙"},
+  {name:"The Apology Card",action:"Apologize to someone — with zero expectation of a response.",icon:"🤝"},
+  {name:"The Money Card",action:"Pull up your bank statement. Classify every transaction as: Survival, Pleasure, or Others. What does the ratio say about what you value?",icon:"💰"},
+  {name:"The Anger Card",action:"Name something you're pretending not to be angry about. Say it out loud. Then ask: what's underneath it?",icon:"🌋"},
+  {name:"The Envy Card",action:"Text someone you secretly envy and genuinely compliment something in their life. Mean it. Notice what that costs you.",icon:"🪞"},
+  {name:"The Mortality Card",action:"Set a 5-minute timer. Sit with the fact that you and everyone you love will die. Don't escape it. Let it land. Then ask: What matters now?",icon:"⏳"},
+  {name:"The Doubt Card",action:"Write God a letter that begins: 'I don't understand why you...' Don't edit. Don't explain. Don't apologize. Just write.",icon:"📝"},
+  {name:"The Body Card",action:"Stand in front of a mirror for 60 seconds without judgment. Just see yourself as God sees you — made deliberately, on purpose, not by accident.",icon:"🪞"},
+  {name:"The Digital Card",action:"Leave your phone in another room for 4 hours. Note the withdrawal symptoms. They are information.",icon:"📵"},
+  {name:"The Justice Card",action:"Research one injustice in your city you know nothing about. Spend 30 minutes learning. Then ask: What does my faith require of me here?",icon:"⚖️"},
+  {name:"The Shadow Card",action:"Complete this sentence: 'The version of me I work hardest to hide is ____.' Don't skip it. This is where healing lives.",icon:"🌘"},
+  {name:"The Politics Card",action:"Name one view held by the political 'other side' that you think has some genuine biblical merit. Say it out loud.",icon:"🗳️"},
+  {name:"The Accountability Card",action:"Text one trusted person: 'I need accountability, not judgment.' Then tell them what you actually need accountability for.",icon:"⛓️"},
+  {name:"The Lament Card",action:"Write your own lament Psalm: complaint, request, trust. Unresolved ending allowed. God can handle it.",icon:"🌧️"},
+  {name:"The Sabbath Card",action:"Schedule a non-negotiable 4-hour Sabbath window this week. No phone. No productivity. No planning. Just being.",icon:"🕯️"},
+];
+let wcIdx=0;
+function drawWildcard(){
+  const w=wildcards[wcIdx%wildcards.length];
+  document.getElementById('wc-icon').textContent=w.icon;
+  document.getElementById('wc-name').textContent=w.name;
+  document.getElementById('wc-action').textContent=w.action;
+  wcIdx++;
+  playBing();
+}
+function shuffleWildcards(){
+  const r=seedRandom(Date.now());
+  wildcards.sort(()=>r()-0.5);
+  wcIdx=0;
+  drawWildcard();
+}
+
+// QUOTES
+const quotes=[
+  {q:"The things that make us feel most alone are really what connect us most passionately — and that's our fear of not being enough.",src:"— Dr. Brené Brown"},
+  {q:"You are a chosen people, a royal priesthood, a holy nation, God's special possession.",src:"— 1 Peter 2:9"},
+  {q:"I praise you because I am fearfully and wonderfully made; your works are wonderful, I know that full well.",src:"— Psalm 139:14"},
+  {q:"Doubt is not the opposite of faith. Pretending is.",src:"— The Critical Audit"},
+  {q:"But those who hope in the Lord will renew their strength. They will soar on wings like eagles.",src:"— Isaiah 40:31"},
+  {q:"The Spirit God gave us does not make us timid, but gives us power, love and self-discipline.",src:"— 2 Timothy 1:7"},
+  {q:"What would love do if it was also wise, holy, honest, and patient?",src:"— The One-Question Discernment Tool"},
+  {q:"Teach us to number our days, that we may gain a heart of wisdom.",src:"— Psalm 90:12"},
+  {q:"Biblical recovery is not 'try harder.' It is come into the light, receive grace, break agreement with lies, rebuild desire, and walk with others toward freedom.",src:"— Hard Life Playbook"},
+  {q:"Even though I walk through the darkest valley, I will fear no evil, for you are with me.",src:"— Psalm 23:4"},
+  {q:"There is no fear in love. But perfect love drives out fear.",src:"— 1 John 4:18"},
+  {q:"Identity is received before it is achieved. Before Jesus performed public ministry, the Father declared, 'You are my beloved Son.'",src:"— Deep Dive Playbook"},
+  {q:"Forgiveness releases vengeance. Reconciliation requires mutual willingness. Trust requires proven change over time.",src:"— Deep Dive Playbook"},
+  {q:"The Sabbath is not a religious suggestion. It is political subversion. You are not a productivity machine. You are a person.",src:"— The Critical Audit"},
+  {q:"Biblical hope is not 'everything is fine.' It is trust in God while telling the truth about what is not fine.",src:"— Theological Anchors"},
+  {q:"My God, my God, why have you forsaken me?",src:"— Psalm 22:1 / Matthew 27:46 (Jesus, on the cross)"},
+  {q:"Generosity in Scripture is never described as charity. It's described as warfare against systems that crush people.",src:"— The Critical Audit"},
+  {q:"The Bible is not just a book for church settings. It is a whole-life formation guide.",src:"— Deep Dive Playbook"},
+  {q:"A gospel that ignores injustice is incomplete. Salvation includes personal forgiveness and societal transformation.",src:"— The Critical Audit"},
+  {q:"We also glory in our sufferings, because suffering produces perseverance; perseverance, character; and character, hope.",src:"— Romans 5:3-4"},
+];
+const shuffledQuotes=seededShuffle(quotes,hourSeed);
+let qmIdx=0;
+function nextQuote(){
+  const q=shuffledQuotes[qmIdx%shuffledQuotes.length];
+  document.getElementById('qm-quote').textContent='"'+q.q+'"';
+  document.getElementById('qm-attr').textContent=q.src;
+  qmIdx++;
+  playBing();
+}
+function shareQuote(){const q=shuffledQuotes[(qmIdx-1+shuffledQuotes.length)%shuffledQuotes.length];if(navigator.share){navigator.share({text:'"'+q.q+'" '+q.src+' — soulquest.bible'})}else{navigator.clipboard.writeText('"'+q.q+'" '+q.src);alert('Copied to clipboard!')}}
+nextQuote();
+
+// BROWSE
+let currentFilter='all';
+function filterBrowse(f,btn){
+  currentFilter=f;
+  document.querySelectorAll('#browse-filters .rf-btn').forEach(b=>b.classList.remove('active-mode'));
+  btn.classList.add('active-mode');
+  renderBrowse();
+}
+function renderBrowse(){
+  const list=document.getElementById('browse-list');
+  list.innerHTML='';
+  const filtered=currentFilter==='all'?allQuestions:allQuestions.filter(q=>q.tag===currentFilter||q.cat===currentFilter);
+  filtered.forEach((q,i)=>{
+    const el=document.createElement('div');
+    el.style.cssText='padding:16px 20px;border:2px solid var(--border);border-radius:12px;background:var(--surface);cursor:pointer;transition:all .2s';
+    el.innerHTML=`<div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--ink2);margin-bottom:6px">${q.tag?.toUpperCase()||''} · ${q.cat?.toUpperCase()||''}</div><div style="font-family:'Fraunces',serif;font-style:italic;font-size:15px;line-height:1.4;color:var(--ink)">"${q.q}"</div>`;
+    el.onmouseenter=()=>el.style.background='var(--surface2)';
+    el.onmouseleave=()=>el.style.background='var(--surface)';
+    list.appendChild(el);
+  });
+}
+renderBrowse();
+
+// SOUNDS
+var audioCtx;
+function playClick(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.connect(g);g.connect(audioCtx.destination);o.frequency.setValueAtTime(500,audioCtx.currentTime);o.frequency.exponentialRampToValueAtTime(200,audioCtx.currentTime+0.07);g.gain.setValueAtTime(0.07,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.07);o.start();o.stop(audioCtx.currentTime+0.07)}
+function playBing(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.connect(g);g.connect(audioCtx.destination);o.type='sine';o.frequency.setValueAtTime(880,audioCtx.currentTime);o.frequency.exponentialRampToValueAtTime(1320,audioCtx.currentTime+0.15);g.gain.setValueAtTime(0.08,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.4);o.start();o.stop(audioCtx.currentTime+0.4)}
+</script>
+</body>
+</html>

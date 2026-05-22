@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 02 — The Critical Audit | SOULQUEST</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Space+Mono:wght@400;700&family=Fraunces:ital,wght@0,100;0,900;1,700&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#f5f0e8;--surface:#ffffff;--surface2:#fff8ee;--ink:#1a1207;--ink2:#4a3f2f;--accent1:#ff4d1c;--accent2:#ffd600;--accent3:#00c896;--accent4:#7c3aed;--accent5:#ff6b9d;--border:#1a1207;--radius:20px;--transition:cubic-bezier(0.34,1.56,0.64,1);--card-h:520px}
+  [data-theme="dark"]{--bg:#0e0c09;--surface:#1c1812;--surface2:#251f14;--ink:#f5f0e8;--ink2:#c8b89a;--accent1:#ff6040;--accent2:#ffe040;--accent3:#00e8a8;--accent4:#a855f7;--accent5:#ff80b0;--border:#f5f0e8}
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Space Mono',monospace;background:var(--bg);color:var(--ink);overflow-x:hidden;transition:background .4s,color .4s}
+  body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:1;opacity:0.5}
+  .cursor{position:fixed;width:20px;height:20px;border:2px solid var(--accent1);border-radius:50%;pointer-events:none;z-index:99999;transform:translate(-50%,-50%);transition:width .15s,height .15s;mix-blend-mode:multiply}
+  [data-theme="dark"] .cursor{mix-blend-mode:screen}
+  .cursor-dot{position:fixed;width:6px;height:6px;background:var(--accent1);border-radius:50%;pointer-events:none;z-index:99999;transform:translate(-50%,-50%)}
+  .cursor.hover{width:44px;height:44px;border-color:var(--accent2)}
+  .dm-toggle{width:44px;height:24px;background:var(--ink);border-radius:12px;cursor:pointer;border:none;display:flex;align-items:center;padding:3px;transition:background .3s;flex-shrink:0}
+  .dm-toggle::after{content:'';width:18px;height:18px;background:var(--bg);border-radius:50%;transition:transform .3s var(--transition)}
+  [data-theme="dark"] .dm-toggle::after{transform:translateX(20px)}
+  nav{position:sticky;top:0;z-index:100;padding:0 clamp(16px,4vw,40px);border-bottom:2px solid var(--border);background:var(--bg);display:flex;align-items:center;justify-content:space-between;min-height:60px;gap:16px;transition:background .4s}
+  .nav-logo{font-family:'Fraunces',serif;font-weight:900;font-size:clamp(16px,4vw,22px);text-decoration:none;color:var(--ink);flex-shrink:0}
+  .nav-right{display:flex;align-items:center;gap:12px}
+  .nav-links{display:flex;gap:clamp(10px,2vw,20px);align-items:center}
+  .nav-link{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--ink2);text-decoration:none;transition:color .2s;white-space:nowrap}
+  .nav-link:hover,.nav-link.active{color:var(--accent1)}
+  .nav-burger{display:none;flex-direction:column;justify-content:center;gap:5px;width:36px;height:36px;cursor:pointer;background:transparent;border:none;padding:7px;flex-shrink:0}
+  .nav-burger span{display:block;width:100%;height:2px;background:var(--ink);border-radius:2px;transition:transform .3s,opacity .3s}
+  .nav-burger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+  .nav-burger.open span:nth-child(2){opacity:0}
+  .nav-burger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+  .nav-mobile{display:none;position:absolute;top:100%;left:0;right:0;background:var(--bg);border-bottom:2px solid var(--border);padding:8px clamp(16px,4vw,40px) 16px;flex-direction:column;z-index:99;transition:background .4s}
+  .nav-mobile.open{display:flex}
+  .nav-mobile .nav-link{font-size:12px;letter-spacing:2px;padding:14px 0;border-bottom:1px solid var(--border);white-space:normal}
+  .nav-mobile .nav-link:last-child{border-bottom:none}
+  @media(max-width:680px){.nav-links{display:none}.nav-burger{display:flex}}
+  /* HERO - dark/dramatic */
+  .page-hero{padding:60px 40px;background:var(--ink);color:var(--bg);position:relative;overflow:hidden;border-bottom:2px solid var(--border)}
+  .page-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 50% 80% at 100% 0%,var(--accent1)33,transparent),radial-gradient(ellipse 40% 60% at 0% 100%,var(--accent4)22,transparent)}
+  .page-badge{font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--accent1);margin-bottom:12px;display:block;position:relative}
+  .page-title{font-family:'Fraunces',serif;font-weight:900;font-size:clamp(40px,8vw,90px);line-height:0.9;margin-bottom:20px;position:relative}
+  .page-sub{font-size:13px;color:var(--ink2);max-width:700px;line-height:1.8;position:relative}
+  [data-theme="dark"] .page-sub{color:#c8b89a}
+  /* MISSED SECTION */
+  .missed{padding:clamp(24px,4vw,48px) clamp(16px,4vw,40px);border-bottom:2px solid var(--border);position:relative;z-index:2}
+  .missed-carousel-wrap{overflow:hidden;border-radius:16px}
+  .missed-track{display:flex;transition:transform .5s cubic-bezier(0.25,0.46,0.45,0.94);will-change:transform}
+  .missed-item{min-width:100%;height:200px;overflow-y:auto;padding:24px 28px 24px 44px;border:2px solid var(--border);border-radius:16px;font-size:14px;line-height:1.8;background:var(--surface);box-sizing:border-box;position:relative;scrollbar-width:thin;scrollbar-color:var(--accent1) transparent}
+  .missed-item::-webkit-scrollbar{width:4px}
+  .missed-item::-webkit-scrollbar-thumb{background:var(--accent1);border-radius:4px}
+  .missed-item::before{content:'—';color:var(--accent1);font-weight:700;position:absolute;left:20px;top:24px;font-size:16px;line-height:1.8}
+  /* THEME TABS */
+  .theme-tabs{display:flex;gap:0;border-bottom:2px solid var(--border);position:sticky;top:65px;z-index:90;background:var(--bg);overflow-x:auto;transition:background .4s}
+  .theme-tab{padding:16px 24px;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;border:none;background:transparent;color:var(--ink2);cursor:pointer;border-right:2px solid var(--border);border-bottom:4px solid transparent;white-space:nowrap;transition:all .2s}
+  .theme-tab.active{color:var(--ink);border-bottom-color:var(--accent1);background:var(--surface2)}
+  /* CAROUSEL */
+  .carousel-section{padding:40px;border-bottom:2px solid var(--border);position:relative;z-index:2}
+  .carousel-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+  .carousel-title{font-family:'Fraunces',serif;font-weight:900;font-size:24px}
+  .carousel-nav{display:flex;gap:8px;align-items:center}
+  .carousel-btn{width:40px;height:40px;border-radius:50%;border:2px solid var(--border);background:var(--surface);color:var(--ink);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .2s var(--transition)}
+  .carousel-btn:hover{background:var(--ink);color:var(--bg);transform:scale(1.1)}
+  .carousel-counter{font-size:11px;letter-spacing:2px;color:var(--ink2);padding:0 8px}
+  .carousel-track-wrap{overflow:hidden;border-radius:var(--radius);border:2px solid var(--border)}
+  .carousel-track{display:flex;transition:transform .5s cubic-bezier(0.25,0.46,0.45,0.94);will-change:transform}
+  /* CARDS */
+  .card{min-width:100%;height:var(--card-h);background:var(--surface);padding:36px;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden;position:relative}
+  .card-inner{overflow-y:auto;flex:1;padding-right:8px;margin-bottom:12px}
+  .card-inner::-webkit-scrollbar{width:3px}
+  .card-inner::-webkit-scrollbar-thumb{background:var(--accent1);border-radius:3px}
+  .card-level{display:inline-block;padding:4px 12px;border-radius:100px;font-size:10px;letter-spacing:3px;text-transform:uppercase;font-weight:700;margin-bottom:12px}
+  .l-money{background:#f59e0b;color:#fff}
+  .l-sex{background:#ec4899;color:#fff}
+  .l-anger{background:#ef4444;color:#fff}
+  .l-burn{background:#f97316;color:#fff}
+  .l-dig{background:#3b82f6;color:#fff}
+  .l-doubt{background:#6366f1;color:#fff}
+  .l-just{background:#10b981;color:#fff}
+  .l-death{background:#374151;color:#fff}
+  .l-wait{background:#8b5cf6;color:#fff}
+  .card-num{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--ink2);margin-bottom:8px}
+  .card-question{font-family:'Fraunces',serif;font-style:italic;font-size:clamp(17px,2.5vw,25px);font-weight:700;line-height:1.3;color:var(--ink);margin-bottom:20px}
+  .card-verse{border-left:4px solid var(--accent1);padding:12px 16px;margin-bottom:14px;font-family:'Fraunces',serif;font-style:italic;font-size:13px;line-height:1.6;color:var(--ink);background:var(--surface2);border-radius:0 8px 8px 0}
+  .card-verse-ref{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--ink2);margin-top:6px;font-style:normal}
+  .card-insight{font-size:12px;line-height:1.8;color:var(--ink2);margin-bottom:12px}
+  .card-insight strong{color:var(--ink)}
+  .card-practice{padding:14px 18px;background:var(--surface2);border-radius:12px;border:1px solid var(--border);font-size:12px;line-height:1.7}
+  .card-practice-label{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--accent1);font-weight:700;margin-bottom:6px;display:block}
+  .card-footer{display:flex;align-items:center;justify-content:space-between;padding-top:12px;border-top:1px solid var(--border);flex-shrink:0}
+  .card-tag{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--ink2)}
+  .card-flip-btn{padding:8px 20px;border-radius:100px;border:2px solid var(--border);background:transparent;color:var(--ink);font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;cursor:pointer;transition:all .2s var(--transition)}
+  .card-flip-btn:hover{background:var(--accent1);color:#fff;border-color:var(--accent1)}
+  /* WILDCARD TABLE */
+  .wild-section{padding:40px;border-bottom:2px solid var(--border);position:relative;z-index:2}
+  .wild-table{width:100%;border-collapse:collapse;font-size:13px}
+  .wild-table th{text-align:left;padding:12px 16px;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--ink2);border-bottom:2px solid var(--border)}
+  .wild-table td{padding:14px 16px;border-bottom:1px solid var(--border);vertical-align:top;line-height:1.7}
+  .wild-table td:first-child{font-weight:700;color:var(--accent1);width:200px;white-space:nowrap}
+  .wild-table tr:hover td{background:var(--surface2)}
+  /* DISCLAIMER */
+  .disclaimer{padding:40px;background:var(--surface2);border-top:2px solid var(--border);font-size:12px;line-height:1.8;color:var(--ink2);position:relative;z-index:2}
+</style>
+</head>
+<body>
+<div class="cursor" id="cursor"></div>
+<div class="cursor-dot" id="cursorDot"></div>
+<nav>
+  <a href="index.html" class="nav-logo">SOULQUEST</a>
+  <div class="nav-right">
+    <div class="nav-links">
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="level1.html" class="nav-link">Module 01</a>
+      <a href="audit.html" class="nav-link active">Module 02</a>
+      <a href="playbook.html" class="nav-link">Module 03</a>
+      <a href="hardlife.html" class="nav-link">Module 04</a>
+      <a href="cards.html" class="nav-link">Module 05</a>
+    </div>
+    <button class="dm-toggle" id="dmToggle" aria-label="Toggle dark mode"></button>
+    <button class="nav-burger" id="navBurger" aria-label="Toggle menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <div class="nav-mobile" id="navMobile">
+    <a href="index.html" class="nav-link">Home</a>
+    <a href="level1.html" class="nav-link">Module 01</a>
+    <a href="audit.html" class="nav-link active">Module 02</a>
+    <a href="playbook.html" class="nav-link">Module 03</a>
+    <a href="hardlife.html" class="nav-link">Module 04</a>
+    <a href="cards.html" class="nav-link">Module 05</a>
+  </div>
+</nav>
+
+<div class="page-hero">
+  <span class="page-badge">✦ Module 02 · The Critical Audit ✦</span>
+  <h1 class="page-title" style="color:var(--bg)">THE<br>CRITICAL<br>AUDIT</h1>
+  <p class="page-sub" style="color:#c8b89a">The original playbook was solid structurally — but it played it safe. It covered the <em>comfortable</em> hard topics. What follows is what the church, media, and most devotional content <strong>systematically avoid</strong>, sanitize, or handle with so much padding they become useless. This expansion goes where most won't.</p>
+</div>
+
+<!-- WHAT WAS MISSED -->
+<div class="missed">
+  <span style="font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--ink2)">⚠️ What the Original Playbook Missed</span>
+  <h2 style="font-family:'Fraunces',serif;font-weight:900;font-size:clamp(24px,4vw,40px);margin-top:8px;margin-bottom:20px">Structural Gaps</h2>
+  <div class="carousel-header" style="margin-bottom:14px">
+    <span style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--ink2)">Gap <span id="gaps-label">1</span> of 15</span>
+    <div class="carousel-nav">
+      <button class="carousel-btn" id="gaps-prev" aria-label="Previous gap">←</button>
+      <span class="carousel-counter" id="gaps-count">1 / 15</span>
+      <button class="carousel-btn" id="gaps-next" aria-label="Next gap">→</button>
+    </div>
+  </div>
+  <div class="missed-carousel-wrap">
+    <div class="missed-track" id="gaps-track">
+      <div class="missed-item">No treatment of <strong>money, wealth, or the prosperity gospel lie</strong> — the Bible's #1 topic after the Kingdom of God</div>
+      <div class="missed-item">No <strong>body, sexuality, or desire</strong> — the Song of Solomon exists and almost no one talks about it honestly</div>
+      <div class="missed-item">No <strong>anger</strong> as a legitimate, God-given emotion (not just a sin to suppress)</div>
+      <div class="missed-item">No <strong>burnout, rest, or the Sabbath</strong> as a psychological/spiritual survival tool</div>
+      <div class="missed-item">No <strong>doubt and questioning God</strong> — the Psalms are <em>full</em> of this</div>
+      <div class="missed-item">No <strong>digital age idolatry</strong> — the most relevant modern application of ancient warnings</div>
+      <div class="missed-item">No <strong>racial justice and systemic sin</strong> — lament as a biblical practice</div>
+      <div class="missed-item">No <strong>ambition vs. calling</strong> — the tension between hustle culture and vocation</div>
+      <div class="missed-item">No <strong>the dark night of the soul</strong> — what happens when God feels absent</div>
+      <div class="missed-item">No <strong>envy and jealousy</strong> as specific, distinct forces (not just lumped as "sin")</div>
+      <div class="missed-item">No <strong>body image and physical shame</strong> — especially for women</div>
+      <div class="missed-item">No <strong>the shadow self</strong> — the biblical concept of what lives inside you that you refuse to name</div>
+      <div class="missed-item">No <strong>death and mortality</strong> — the most avoided topic in Western Christianity</div>
+      <div class="missed-item">No <strong>political idolatry</strong> — when a party, flag, or ideology becomes your real religion</div>
+      <div class="missed-item">No <strong>waiting and wilderness seasons</strong> — the theology of <em>not yet</em></div>
+    </div>
+  </div>
+</div>
+
+<!-- THEME TABS -->
+<div class="theme-tabs" id="themeTabs">
+  <button class="theme-tab active" data-theme-id="money">💰 Money</button>
+  <button class="theme-tab" data-theme-id="sex">🔥 Sexuality</button>
+  <button class="theme-tab" data-theme-id="anger">😤 Anger & Shadow</button>
+  <button class="theme-tab" data-theme-id="burn">⚡ Burnout</button>
+  <button class="theme-tab" data-theme-id="dig">📱 Digital</button>
+  <button class="theme-tab" data-theme-id="doubt">🌑 Doubt</button>
+  <button class="theme-tab" data-theme-id="just">⚖️ Justice</button>
+  <button class="theme-tab" data-theme-id="death">💀 Death</button>
+  <button class="theme-tab" data-theme-id="wait">⏳ Waiting</button>
+  <button class="theme-tab" data-theme-id="expwild">🃏 Expanded Wildcards</button>
+</div>
+
+<!-- MONEY -->
+<div id="panel-money">
+  <div class="carousel-section">
+    <div style="padding:16px 0;margin-bottom:20px;border-bottom:2px solid var(--border)">
+      <span style="font-size:10px;letter-spacing:4px;text-transform:uppercase;color:#f59e0b">💰 Money & Wealth</span>
+      <h2 style="font-family:'Fraunces',serif;font-weight:900;font-size:32px;margin-top:8px">The Topic Jesus Talked About<br>More Than Heaven or Hell</h2>
+    </div>
+    <div class="carousel-header"><div class="carousel-title">Cards 16–17</div>
+      <div class="carousel-nav"><button class="carousel-btn" id="mprev">←</button><span class="carousel-counter" id="mcount">1 / 2</span><button class="carousel-btn" id="mnext">→</button></div>
+    </div>
+    <div class="carousel-track-wrap"><div class="carousel-track" id="mtrack">
+      <div class="card">
+        <div class="card-inner">
+          <span class="card-level l-money">💰 Money & Wealth</span>
+          <div class="card-num">🃏 Card 16 — Your Real God</div>
+          <div class="card-question">"If someone audited your bank statements and calendar — what would they say you actually worship?"</div>
+          <div class="card-verse">"No one can serve two masters. Either you will hate the one and love the other, or you will be devoted to the one and despise the other. You cannot serve both God and money."<div class="card-verse-ref">— Matthew 6:24 (NIV)</div></div>
+          <div class="card-insight">The Bible never condemns wealth itself but consistently warns about the dangers of loving it, trusting it, or pursuing it at any cost. Abraham was wealthy. Job was wealthy. Joseph of Arimathea was wealthy. The issue isn't the amount in your bank account but what you're willing to do to get it, how you use it once you have it, and whether it owns you or you steward it.<br><br><strong>The Two Lies the Church Tells:</strong> There are two extreme financial teachings: the Prosperity Gospel and the Poverty Gospel. Both are wrong. The Prosperity Gospel teaches you can command God to prosper you financially. The Poverty Gospel claims that money is evil and being poor makes you more righteous. Scripture instructs: "Give me neither poverty nor riches, but give me only my daily bread" (Proverbs 30:8).<br><br><strong>The Sodom Nobody Talks About:</strong> Ezekiel 16:49 — "This was the guilt of your sister Sodom: she and her daughters had pride, excess of food, and prosperous ease, but did not aid the poor and needy." The city we remember for one thing was actually judged for this.</div>
+          <div class="card-practice"><span class="card-practice-label">🔑 The Practice</span>Write down your monthly spending in three columns: <em>Survival, Pleasure, Others.</em> Don't edit it. Sit with what you see.</div>
+        </div>
+        <div class="card-footer"><span class="card-tag">#Money #Idolatry #Worship</span><button class="card-flip-btn">Reflect ✦</button></div>
+      </div>
+      <div class="card">
+        <div class="card-inner">
+          <span class="card-level l-money">💰 Money & Wealth</span>
+          <div class="card-num">🃏 Card 17 — Generosity as Warfare</div>
+          <div class="card-question">"When did you last give something that genuinely cost you?"</div>
+          <div class="card-verse">"Whoever is kind to the poor lends to the LORD, and he will reward them for what they have done."<div class="card-verse-ref">— Proverbs 19:17 (NIV)</div></div>
+          <div class="card-insight"><strong>Hidden Gem — The Isaiah 58 Passage:</strong> "Is not this the kind of fasting I have chosen: to loose the chains of injustice and untie the cords of the yoke, to set the oppressed free and break every yoke? Is it not to share your food with the hungry?" — Isaiah 58:6-7<br><br>A gospel that ignores injustice is incomplete. Salvation includes personal forgiveness and societal transformation. Biblical justice does not simply seek fairness in legal terms — it reflects God's character and His expectations for how humans should treat one another.<br><br>Generosity in Scripture is never described as charity. It's described as <strong>warfare against systems that crush people.</strong> That's a completely different posture.</div>
+          <div class="card-practice"><span class="card-practice-label">🔑 The Practice</span>Identify one systemic injustice in your zip code. Then ask: <em>What is one thing I can do with my money, time, or influence this month that costs me something real?</em></div>
+        </div>
+        <div class="card-footer"><span class="card-tag">#Generosity #Justice #Giving</span><button class="card-flip-btn">Reflect ✦</button></div>
+      </div>
+    </div></div>
+  </div>
+</div>
+
+<!-- SEXUALITY -->
+<div id="panel-sex" style="display:none">
+  <div class="carousel-section">
+    <div style="padding:16px 0;margin-bottom:20px;border-bottom:2px solid var(--border)">
+      <span style="font-size:10px;letter-spacing:4px;text-transform:uppercase;color:#ec4899">🔥 Sexuality, Desire & the Body</span>
+      <h2 style="font-family:'Fraunces',serif;font-weight:900;font-size:32px;margin-top:8px">The Topic the Church<br>Gets Both Completely Wrong</h2>
+    </div>
+    <div class="carousel-header"><div class="carousel-title">Cards 18–19</div>
+      <div class="carousel-nav"><button class="carousel-btn" id="sprev">←</button><span class="carousel-counter" id="scount">1 / 2</span><button class="carousel-btn" id="snext">→</button></div>
+    </div>
+    <div class="carousel-track-wrap"><div class="carousel-track" id="strack">
+      <div class="card">
+        <div class="card-inner">
+          <span class="card-level l-sex">🔥 Sexuality</span>
+          <div class="card-num">🃏 Card 18 — Your Body Is Not the Enemy</div>
+          <div class="card-question">"What messages did you absorb about your body growing up — from church, family, or culture?"</div>
+          <div class="card-verse">"She is altogether beautiful, my darling; there is no flaw in you."<div class="card-verse-ref">— Song of Solomon 4:7 (NIV)</div></div>
+          <div class="card-insight">Some Christians underrate sex by treating it as something inherently shameful, dirty, or insignificant. In some churches, sex is either avoided as a taboo subject or framed solely in terms of what not to do. This silence leads many to internalize shame, especially if they struggle with sexual desires or sin. Yet the Bible does not shy away from the subject of sex. The Song of Solomon celebrates the passion and beauty of marital intimacy, painting a picture of sex that is both spiritual and pleasurable.<br><br><strong>The Two Failures:</strong> According to a recent Barna Group study, 62% of Christians now believe someone can regularly watch pornography and still live a sexually healthy life — exposing a profound lack of biblical understanding regarding sexuality. Meanwhile, the other failure is teaching shame and rules with zero theology of <em>why</em> the body matters, why desire is not evil, and why God invented physical pleasure in the first place.<br><br><strong>The Actual Biblical View:</strong> The human body and soul are in union. Lust turns people into cheap, counterfeit versions of our authentic, embodied, sexual selves.</div>
+          <div class="card-practice"><span class="card-practice-label">🔑 The Practice</span>Identify one shame message you received about your body. Ask: <em>Is this from God or from broken humans?</em> The difference matters enormously.</div>
+        </div>
+        <div class="card-footer"><span class="card-tag">#BodyImage #Shame #Sexuality</span><button class="card-flip-btn">Reflect ✦</button></div>
+      </div>
+      <div class="card">
+        <div class="card-inner">
+          <span class="card-level l-sex">🔥 Sexuality</span>
+          <div class="card-num">🃏 Card 19 — Desire Is Not Sin</div>
+          <div class="card-question">"Do you feel guilty for wanting things — connection, pleasure, success, love?"</div>
+          <div class="card-verse">"Delight yourself in the Lord, and he will give you the desires of your heart."<div class="card-verse-ref">— Psalm 37:4 (NIV)</div></div>
+          <div class="card-insight">This verse is NOT saying God will give you whatever you want if you're spiritual enough. It's saying that when you're genuinely aligned with God, your <em>desires themselves</em> are transformed. You stop wanting what destroys you.<br><br>The answer is not suppression — it's <em>chastity</em>, which means living in accord with the truth of our bodies. The truly chaste person is not only someone who does the right thing but also someone who desires to do the right thing. This answers Jesus' call to purify our hearts — not just our actions.</div>
+          <div class="card-practice"><span class="card-practice-label">🔑 The Practice</span>Name one desire you've been ashamed of. Ask: <em>Is the desire itself the problem, or is it the direction I've been pointing it?</em></div>
+        </div>
+        <div class="card-footer"><span class="card-tag">#Desire #Chastity #Heart</span><button class="card-flip-btn">Reflect ✦</button></div>
+      </div>
+    </div></div>
+  </div>
+</div>
+
+<!-- ANGER & SHADOW -->
+<div id="panel-anger" style="display:none">
+  <div class="carousel-section">
+    <div style="padding:16px 0;margin-bottom:20px;border-bottom:2px solid var(--border)">
+      <span style="font-size:10px;letter-spacing:4px;text-transform:uppercase;color:#ef4444">😤 Anger, Envy & the Shadow Self</span>
+      <h2 style="font-family:'Fraunces',serif;font-weight:900;font-size:32px;margin-top:8px">The Emotions You Perform<br>Your Way Through at Church</h2>
+    </div>
+    <div class="carousel-header"><div class="carousel-title">Cards 20–22</div>
+      <div class="carousel-nav"><button class="carousel-btn" id="aprev">←</button><span class="carousel-counter" id="acount">1 / 3</span><button class="carousel-btn" id="anext">→</button></div>
+    </div>
+    <div class="carousel-track-wrap"><div class="carousel-track" id="atrack">
+      <div class="card">
+        <div class="card-inner">
+          <span class="card-level l-anger">😤 Anger</span>
+          <div class="card-num">🃏 Card 20 — Your Anger Is Information</div>
+          <div class="card-question">"What are you angrier about than you admit to people?"</div>
+          <div class="card-verse">"In your anger do not sin: Do not let the sun go down while you are still angry."<div class="card-verse-ref">— Ephesians 4:26 (NIV)</div></div>
+          <div class="card-insight">Notice — Paul does NOT say "do not be angry." He says <em>in your anger.</em> Anger is <strong>assumed</strong>. It's the response that's being addressed. Jesus himself got angry (John 2:13-17 — the temple clearing). God is described as angry hundreds of times in Scripture.<br><br><strong>What Anger Actually Is:</strong> Anger is almost always <em>fear or pain in a louder outfit.</em> When you're angry, ask: <em>What am I afraid of losing? What wound just got touched?</em><br><br><strong>What the Church Does Wrong:</strong> Teaches people to suppress anger under the language of "forgiveness" and "peace" — producing either emotional numbness or explosions. Neither is biblical.</div>
+          <div class="card-practice"><span class="card-practice-label">🔑 The Practice</span>The next time you feel anger, don't perform calm. Write down: <em>What am I afraid of? What do I actually need right now?</em></div>
+        </div>
+        <div class="card-footer"><span class="card-tag">#Anger #Emotions #Fear</span><button class="card-flip-btn">Reflect ✦</button></div>
+      </div>
+      <div class="card">
+        <div class="card-inner">
+          <span class="card-level l-anger">😤 Envy</span>
+          <div class="card-num">🃏 Card 21 — Envy: The Bone-Rotting Secret</div>
+          <div class="card-question">"Whose success makes you feel smaller? Be honest."</div>
+          <div class="card-verse">"A heart at peace gives life to the body, but envy rots the bones."<div class="card-verse-ref">— Proverbs 14:30 (NIV)</div></div>
+          <div class="card-insight">The Bible ranks jealousy as worse than anger. Anger can be addressed. Jealousy, left unchecked, is all-consuming. James describes the chaos that jealousy creates: not just emotional turmoil, but relational and spiritual breakdown.<br><br>Saul's jealousy of David consumed him — it didn't hurt David, it destroyed Saul. This pattern shows up throughout Scripture.<br><br><strong>The Uncomfortable Insight:</strong> Solomon observes how envy often fuels ambition — all toil and achievement spring from one person's envy of another. This too is vanity and chasing after the wind. Your hustle culture might be running on envy fumes, not purpose.</div>
+          <div class="card-practice"><span class="card-practice-label">🔑 The Practice</span>Name the person whose life you most secretly envy. Then ask: <em>What does that envy tell me about what I actually want for myself?</em> Use envy as a compass, not a verdict.</div>
+        </div>
+        <div class="card-footer"><span class="card-tag">#Envy #Jealousy #Comparison</span><button class="card-flip-btn">Reflect ✦</button></div>
+      </div>
+      <div class="card">
+        <div class="card-inner">
+          <span class="card-level l-anger">🪞 Shadow Self</span>
+          <div class="card-num">🃏 Card 22 — The Shadow Self</div>
+          <div class="card-question">"What part of yourself do you most work to hide — even from yourself?"</div>
+          <div class="card-verse">"The heart is deceitful above all things and beyond cure. Who can understand it?"<div class="card-verse-ref">— Jeremiah 17:9 (NIV)</div></div>
+          <div class="card-insight">The Bible's honesty about human self-deception is sophisticated psychology centuries before psychology existed. You are capable of lying to yourself with complete sincerity. The parts of you that scare you most are often the parts most in need of grace — not more hiding.<br><br><strong>The Shadow in Scripture:</strong> Cain's rage before the murder. David's lust that became cover-up and murder. Peter's self-confidence that became denial. The biblical heroes are not airbrushed. Their shadow selves are on full display — and God still used every single one of them.<br><br>"Search me, God, and know my heart; test me and know my anxious thoughts. See if there is any offensive way in me, and lead me in the way everlasting." — Psalm 139:23-24. This is not performance. This is surgery.</div>
+          <div class="card-practice"><span class="card-practice-label">🔑 The Practice</span>Complete this sentence, alone, in writing: <em>"The version of me I'm most afraid people will discover is ____."</em> Don't skip this one.</div>
+        </div>
+        <div class="card-footer"><span class="card-tag">#ShadowSelf #Honesty #Grace</span><button class="card-flip-btn">Reflect ✦</button></div>
+      </div>
+    </div></div>
+  </div>
+</div>
+
+<!-- BURNOUT -->
+<div id="panel-burn" style="display:none">
+  <div class="carousel-section">
+    <div style="padding:16px 0;margin-bottom:20px;border-bottom:2px solid var(--border)">
+      <span style="font-size:10px;letter-spacing:4px;text-transform:uppercase;color:#f97316">⚡ Burnout, Rest & the Sabbath</span>
+      <h2 style="font-family:'Fraunces',serif;font-weight:900;font-size:32px;margin-top:8px">The Most Revolutionary — and Most Ignored —<br>Command in the Bible</h2>
+    </div>
+    <div class="carousel-header"><div class="carousel-title">Cards 23–24</div>
+      <div class="carousel-nav"><button class="carousel-btn" id="bprev">←</button><span class="carousel-counter" id="bcount">1 / 2</span><button class="carousel-btn" id="bnext">→</button></div>
+    </div>
+    <div class="carousel-track-wrap"><div class="carousel-track" id="btrack">
+      <div class="card">
+        <div class="card-inner">
+          <span class="card-level l-burn">⚡ Burnout</span>
+          <div class="card-num">🃏 Card 23 — Burnout Is Not a Badge of Honor</div>
+          <div class="card-question">"When did you last truly rest — not scrolled, not 'decompressed,' but actually rested?"</div>
+          <div class="card-verse">"Come to me, all you who are weary and burdened, and I will give you rest."<div class="card-verse-ref">— Matthew 11:28 (NIV)</div></div>
+          <div class="card-insight">In the hyper-connected digital landscape of 2026, our minds rarely find a moment of true silence. Between the constant pulse of notifications and the pressure to perform in an AI-driven world, "digital burnout" has become a collective experience. We are more connected than ever, yet many feel a profound sense of isolation, depression, and hopelessness.<br><br><strong>The Sabbath as Rebellion:</strong> The Sabbath is not a religious suggestion. In its original context, it was <em>political subversion.</em> Israel had been slaves in Egypt — a culture that never stopped working them. God's command to stop was a declaration: <strong>you are not a productivity machine. You are a person. Stop proving your worth through output.</strong><br><br>Sabbath habits — scheduling a weekly day off, using electronic-Sabbath settings to silence notifications — are not just spiritual disciplines but evidence-based actions that restore the nervous system and reduce cortisol levels.</div>
+          <div class="card-practice"><span class="card-practice-label">🔑 The Practice</span>Schedule a non-negotiable 4-hour Sabbath window this week. No phone. No productivity. No planning. Just being. Notice how uncomfortable that makes you — that discomfort is data.</div>
+        </div>
+        <div class="card-footer"><span class="card-tag">#Burnout #Sabbath #Rest</span><button class="card-flip-btn">Reflect ✦</button></div>
+      </div>
+      <div class="card">
+        <div class="card-inner">
+          <span class="card-level l-burn">⚡ Burnout</span>
+          <div class="card-num">🃏 Card 24 — Elijah Under the Juniper Tree</div>
+          <div class="card-question">"Have you ever hit a wall so hard you told God you were done?"</div>
+          <div class="card-verse">"He came to a broom bush, sat down under it and prayed that he might die. 'I have had enough, LORD,' he said."<div class="card-verse-ref">— 1 Kings 19:4 (NIV)</div></div>
+          <div class="card-insight"><strong>The Most Underpreached Story in the Bible:</strong> Elijah — the greatest prophet in Israel's history — had a full mental health collapse immediately after his greatest spiritual victory. Read the sequence: miracle, acclaim, then complete breakdown. Sound familiar?<br><br><strong>What God Did:</strong> Did NOT rebuke him. Did NOT give him a motivational speech. Did NOT tell him to pray more. God <strong>let him sleep.</strong> Then sent an angel with food. Twice. Then more sleep. Then a gentle question: <em>"What are you doing here, Elijah?"</em><br><br>The entire divine response to clinical-level burnout and suicidal ideation was: <em>rest, food, and a gentle question.</em></div>
+          <div class="card-practice"><span class="card-practice-label">🔑 The Practice</span>If you are burned out right now — sleep first. Eat something. Then, when you have capacity, ask yourself: <em>What am I actually carrying that isn't mine to carry?</em></div>
+        </div>
+        <div class="card-footer"><span class="card-tag">#Burnout #MentalHealth #Elijah</span><button class="card-flip-btn">Reflect ✦</button></div>
+      </div>
+    </div></div>
+  </div>
+</div>
+
+<!-- DIGITAL -->
+<div id="panel-dig" style="display:none">
+  <div class="carousel-section">
+    <div style="padding:16px 0;margin-bottom:20px;border-bottom:2px solid var(--border)">
+      <span style="font-size:10px;letter-spacing:4px;text-transform:uppercase;color:#3b82f6">📱 Digital Idolatry</span>
+      <h2 style="font-family:'Fraunces',serif;font-weight:900;font-size:32px;margin-top:8px">The Modern Golden Calf<br>Nobody Talks About at Church</h2>
+    </div>
+    <div class="carousel-header"><div class="carousel-title">Card 25</div>
+      <div class="carousel-nav"><button class="carousel-btn" id="dprev">←</button><span class="carousel-counter" id="dcount">1 / 1</span><button class="carousel-btn" id="dnext">→</button></div>
+    </div>
+    <div class="carousel-track-wrap"><div class="carousel-track" id="dtrack">
+      <div class="card">
+        <div class="card-inner">
+          <span class="card-level l-dig">📱 Digital Idolatry</span>
+          <div class="card-num">🃏 Card 25 — Your Phone Is Shaping Your Soul</div>
+          <div class="card-question">"What does your phone know about you that your closest friends don't?"</div>
+          <div class="card-verse">"You shall have no other gods before me."<div class="card-verse-ref">— Exodus 20:3 (NIV)</div></div>
+          <div class="card-insight">What we turn to in boredom, anxiety, or fatigue reveals what we truly trust. Digital addiction is not just a habit. It's a form of worship. And more often than we realize, it's idolatry — glowing, buzzing, and sitting quietly in our pockets.<br><br>For all of the friends we have on Facebook, this is a lonely world. Loneliness is the loss of embodied relationships that cannot be replaced by friendships online. One of the most radical things Christians can do right now is face-to-face communication — preferably around a dinner table, around a meal.<br><br><strong>The Research:</strong> Studies show that heavy smartphone use contributes to a decline in social skills, less self-control, emotional instability, and increased difficulty making friends. Heavy consumption of digital pornography negatively impacts social and romantic relationships, contributes to social anxiety, and entertains distorted views of sexuality.</div>
+          <div class="card-practice"><span class="card-practice-label">🔑 The Practice</span>Check your screen time. Don't minimize the number. Ask: <em>If I replaced half of this with Scripture, prayer, or real human conversation — what would change in my life in 90 days?</em></div>
+        </div>
+        <div class="card-footer"><span class="card-tag">#Digital #Idolatry #Loneliness</span><button class="card-flip-btn">Reflect ✦</button></div>
+      </div>
+    </div></div>
+  </div>
+</div>
+
+<!-- DOUBT -->
+<div id="panel-doubt" style="display:none">
+  <div class="carousel-section">
+    <div style="padding:16px 0;margin-bottom:20px;border-bottom:2px solid var(--border)">
+      <span style="font-size:10px;letter-spacing:4px;text-transform:uppercase;color:#6366f1">🌑 Doubt, Darkness & the Dark Night of the Soul</span>
+      <h2 style="font-family:'Fraunces',serif;font-weight:900;font-size:32px;margin-top:8px">The Faith Journey the<br>Prosperity Gospel Forgot to Mention</h2>
+    </div>
+    <div class="carousel-header"><div class="carousel-title">Cards 26–27</div>
+      <div class="carousel-nav"><button class="carousel-btn" id="do2prev">←</button><span class="carousel-counter" id="do2count">1 / 2</span><button class="carousel-btn" id="do2next">→</button></div>
+    </div>
+    <div class="carousel-track-wrap"><div class="carousel-track" id="do2track">
+      <div class="card">
+        <div class="card-inner">
+          <span class="card-level l-doubt">🌑 Doubt</span>
+          <div class="card-num">🃏 Card 26 — It's Okay to Not Be Okay With God</div>
+          <div class="card-question">"Have you ever been genuinely angry at God? Did you admit it?"</div>
+          <div class="card-verse">"My God, my God, why have you forsaken me?"<div class="card-verse-ref">— Psalm 22:1 (NIV) — also: Matthew 27:46</div></div>
+          <div class="card-insight"><strong>The Radical Truth:</strong> Jesus quoted this on the cross. It's not a lack of faith. It is <strong>the most raw, honest prayer in human history</strong> — and God included it in Scripture twice.<br><br><strong>The Psalms of Lament:</strong> 42 of the 150 Psalms are classified as laments — meaning one-third of Israel's entire songbook is people yelling at God in pain. This is not tolerated. It is <strong>modeled.</strong><br><br><strong>The Dark Night of the Soul:</strong> The psalmist in Psalm 73 was tempted to conclude that obeying God was useless: "All in vain have I kept my heart clean." Yet God kept him during his dark night of the soul — holding him by the hand, guiding him with counsel. The very questions and doubts that threatened his relationship with God, God used to draw him closer. Doubt is not the opposite of faith. Pretending is.</div>
+          <div class="card-practice"><span class="card-practice-label">🔑 The Practice</span>Write God a letter. Say the thing you've been too polite to say. He already knows it. The point is you saying it.</div>
+        </div>
+        <div class="card-footer"><span class="card-tag">#Doubt #Lament #Honesty</span><button class="card-flip-btn">Reflect ✦</button></div>
+      </div>
+      <div class="card">
+        <div class="card-inner">
+          <span class="card-level l-doubt">🌑 Wilderness</span>
+          <div class="card-num">🃏 Card 27 — The Wilderness Season (When God Feels Gone)</div>
+          <div class="card-question">"Is there a season of your life where God felt completely absent? What happened to your faith in it?"</div>
+          <div class="card-verse">"Even though I walk through the darkest valley, I will fear no evil, for you are with me."<div class="card-verse-ref">— Psalm 23:4 (NIV)</div></div>
+          <div class="card-insight"><strong>The Hidden Truth:</strong> The valley is not a detour from the path — it's ON the path. The shepherd leads <em>through</em> it, not around it.<br><br><strong>The Biblical Pattern:</strong> Every major biblical figure went through a wilderness before their purpose emerged. Joseph — 13 years in prison. Moses — 40 years in the desert. David — years on the run from Saul. Jesus — 40 days in the desert before his ministry began. Paul — years in Arabia after his conversion.<br><br><strong>The Wilderness Purpose:</strong> Wilderness strips away every identity that isn't rooted in God. You can't perform your way through the wilderness. You can only <em>endure.</em> And something gets built in the enduring that cannot be built any other way.</div>
+          <div class="card-practice"><span class="card-practice-label">🔑 The Practice</span>Name your current or last wilderness season. Ask: <em>What is being stripped away? What is being built in its place?</em></div>
+        </div>
+        <div class="card-footer"><span class="card-tag">#Wilderness #Doubt #Endurance</span><button class="card-flip-btn">Reflect ✦</button></div>
+      </div>
+    </div></div>
+  </div>
+</div>
+
+<!-- JUSTICE -->
+<div id="panel-just" style="display:none">
+  <div class="carousel-section">
+    <div style="padding:16px 0;margin-bottom:20px;border-bottom:2px solid var(--border)">
+      <span style="font-size:10px;letter-spacing:4px;text-transform:uppercase;color:#10b981">⚖️ Justice, Lament & the World's Pain</span>
+      <h2 style="font-family:'Fraunces',serif;font-weight:900;font-size:32px;margin-top:8px">The Prophets Were Never Comfortable.<br>Why Are We?</h2>
+    </div>
+    <div class="carousel-header"><div class="carousel-title">Cards 28–29</div>
+      <div class="carousel-nav"><button class="carousel-btn" id="jprev">←</button><span class="carousel-counter" id="jcount">1 / 2</span><button class="carousel-btn" id="jnext">→</button></div>
+    </div>
+    <div class="carousel-track-wrap"><div class="carousel-track" id="jtrack">
+      <div class="card">
+        <div class="card-inner">
+          <span class="card-level l-just">⚖️ Justice</span>
+          <div class="card-num">🃏 Card 28 — Lament Is a Spiritual Discipline</div>
+          <div class="card-question">"When did you last grieve something in the world that didn't directly affect you?"</div>
+          <div class="card-verse">"How long, Lord, must I call for help, but you do not listen? Or cry out to you, 'Violence!' but you do not save?"<div class="card-verse-ref">— Habakkuk 1:2 (NIV)</div></div>
+          <div class="card-insight">Lament is not complaining. Lament is the <strong>disciplined practice of bringing the world's pain into God's presence and refusing to look away.</strong> The prophets were experts. The Western church has largely lost it.<br><br>All people are created in God's image (Genesis 1:27). Racism violates this foundational truth by treating some lives as less valuable. Biblical justice does not simply seek fairness in legal terms — it reflects God's character and His expectations for how humans treat one another.<br><br><strong>The Sodom Verse Nobody Quotes:</strong> "This was the guilt of your sister Sodom: she and her daughters had pride, excess of food, and prosperous ease, but did not aid the poor and needy" (Ezekiel 16:49). The silence of the comfortable is also a verdict.</div>
+          <div class="card-practice"><span class="card-practice-label">🔑 The Practice</span>Choose one piece of suffering in the world right now — not a political side, just a human reality — and sit with it in prayer for 10 minutes without solving it, explaining it, or politicizing it. Just grieve it.</div>
+        </div>
+        <div class="card-footer"><span class="card-tag">#Justice #Lament #Prophets</span><button class="card-flip-btn">Reflect ✦</button></div>
+      </div>
+      <div class="card">
+        <div class="card-inner">
+          <span class="card-level l-just">⚖️ Politics</span>
+          <div class="card-num">🃏 Card 29 — Political Idolatry: When Your Party Becomes Your God</div>
+          <div class="card-question">"If your political party and your Bible directly contradicted each other — which would you adjust?"</div>
+          <div class="card-verse">"Do not put your trust in princes, in human beings, who cannot save."<div class="card-verse-ref">— Psalm 146:3 (NIV)</div></div>
+          <div class="card-insight"><strong>The Critical Problem:</strong> Evangelicals will continue to create a political divide by creating an "us vs them" mentality. Gen Xers and Millennials who barely made it through the politicizing of their church — politics being preached more than the gospel — will not be able to withstand a second round and will leave churches. Gen Z may not even make it into the church.<br><br>Sermons avoided entire categories of teaching: judgment, sexual ethics, repentance, exclusivity of Christ. Scripture was quoted selectively, often framed with disclaimers or apologies.<br><br><strong>The Test:</strong> Jesus was not a Republican or a Democrat. He defended the woman caught in adultery (mercy), overturned the money changers' tables (justice), affirmed government's limited role (Caesar's things/God's things), and consistently prioritized the marginalized, poor, and outcast.</div>
+          <div class="card-practice"><span class="card-practice-label">🔑 The Practice</span>List 5 political beliefs you hold strongly. For each one, find the <em>primary</em> biblical text — not a proof-text, a primary text — that supports it. If you can't, that's information.</div>
+        </div>
+        <div class="card-footer"><span class="card-tag">#Politics #Idolatry #Kingdom</span><button class="card-flip-btn">Reflect ✦</button></div>
+      </div>
+    </div></div>
+  </div>
+</div>
+
+<!-- DEATH -->
+<div id="panel-death" style="display:none">
+  <div class="carousel-section">
+    <div style="padding:16px 0;margin-bottom:20px;border-bottom:2px solid var(--border)">
+      <span style="font-size:10px;letter-spacing:4px;text-transform:uppercase;color:#374151">💀 Death & Mortality</span>
+      <h2 style="font-family:'Fraunces',serif;font-weight:900;font-size:32px;margin-top:8px">The One Topic Western Christianity<br>Is Completely Unprepared For</h2>
+    </div>
+    <div class="carousel-header"><div class="carousel-title">Card 30</div>
+      <div class="carousel-nav"><button class="carousel-btn" id="de2prev">←</button><span class="carousel-counter" id="de2count">1 / 1</span><button class="carousel-btn" id="de2next">→</button></div>
+    </div>
+    <div class="carousel-track-wrap"><div class="carousel-track" id="de2track">
+      <div class="card">
+        <div class="card-inner">
+          <span class="card-level l-death">💀 Death & Mortality</span>
+          <div class="card-num">🃏 Card 30 — You Are Going to Die. Live Accordingly.</div>
+          <div class="card-question">"If you died in a year, what would you stop doing? What would you start?"</div>
+          <div class="card-verse">"Teach us to number our days, that we may gain a heart of wisdom."<div class="card-verse-ref">— Psalm 90:12 (NIV)</div></div>
+          <div class="card-insight"><strong>What the Bible Actually Says About Death:</strong> It's not avoided. It's <em>engaged.</em> Ecclesiastes spends its entire existence staring at death and asking what makes life worth living anyway. The answer: simple pleasures, honest work, real relationships, and fear of God. That's it. Not accolades. Not legacy management. Not hustle.<br><br><strong>The Resurrection Reframe:</strong> Paul writes: "We do not grieve like the rest of mankind, who have no hope. For we believe that Jesus died and rose again" (1 Thessalonians 4:13-14). This is not denial of grief. It's grief <em>with a different horizon.</em><br><br><strong>The Stoic-Biblical Overlap:</strong> Marcus Aurelius: <em>"Memento mori — remember you will die."</em> Paul: <em>"For to me, to live is Christ and to die is gain"</em> (Philippians 1:21). Both agree that confronting mortality clarifies everything.</div>
+          <div class="card-practice"><span class="card-practice-label">🔑 The Practice</span>Write your tombstone inscription. Not what you want people to say — what you're actually building toward, honestly. Then ask: <em>Am I living toward that? If not, what has to change?</em></div>
+        </div>
+        <div class="card-footer"><span class="card-tag">#Death #Mortality #Legacy</span><button class="card-flip-btn">Reflect ✦</button></div>
+      </div>
+    </div></div>
+  </div>
+</div>
+
+<!-- WAITING -->
+<div id="panel-wait" style="display:none">
+  <div class="carousel-section">
+    <div style="padding:16px 0;margin-bottom:20px;border-bottom:2px solid var(--border)">
+      <span style="font-size:10px;letter-spacing:4px;text-transform:uppercase;color:#8b5cf6">⏳ The Theology of Waiting</span>
+      <h2 style="font-family:'Fraunces',serif;font-weight:900;font-size:32px;margin-top:8px">God's Favorite Curriculum<br>That Nobody Signs Up For</h2>
+    </div>
+    <div class="carousel-header"><div class="carousel-title">Card 31</div>
+      <div class="carousel-nav"><button class="carousel-btn" id="wprev2">←</button><span class="carousel-counter" id="wcount2">1 / 1</span><button class="carousel-btn" id="wnext2">→</button></div>
+    </div>
+    <div class="carousel-track-wrap"><div class="carousel-track" id="wtrack2">
+      <div class="card">
+        <div class="card-inner">
+          <span class="card-level l-wait">⏳ Waiting</span>
+          <div class="card-num">🃏 Card 31 — The Answer Is "Not Yet"</div>
+          <div class="card-question">"What have you been waiting for so long you've started to doubt it will ever come?"</div>
+          <div class="card-verse">"But those who hope in the Lord will renew their strength. They will soar on wings like eagles; they will run and not grow weary, they will walk and not be faint."<div class="card-verse-ref">— Isaiah 40:31 (NIV)</div></div>
+          <div class="card-insight"><strong>The Hidden Insight:</strong> The original Hebrew word <em>qavah</em> (translated "hope") doesn't mean wishful thinking. It means <em>to twist together, to bind like a rope.</em> It's active, muscular hope — the kind you work at, maintain, and hold under tension.<br><br><strong>The Pattern:</strong> Abraham waited 25 years for Isaac. Joseph waited 13 years in prison. Hannah wept through years of barrenness before Samuel. The early church waited in an upper room for 10 days before Pentecost. Waiting is not a malfunction. It is <strong>curriculum</strong>.<br><br><strong>What Waiting Produces:</strong> Romans 5:3-4 — "We also glory in our sufferings, because suffering produces perseverance; perseverance, character; and character, hope." This is a sequence, not a sentiment. You cannot shortcut it.</div>
+          <div class="card-practice"><span class="card-practice-label">🔑 The Practice</span>Name what you're waiting for. Then ask: <em>What is this season building in me that could not be built any other way? What would I miss if it arrived today?</em></div>
+        </div>
+        <div class="card-footer"><span class="card-tag">#Waiting #Hope #Perseverance</span><button class="card-flip-btn">Reflect ✦</button></div>
+      </div>
+    </div></div>
+  </div>
+</div>
+
+<!-- EXPANDED WILDCARDS -->
+<div id="panel-expwild" style="display:none">
+  <div class="wild-section">
+    <span style="font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--ink2)">🃏 The Expanded Wildcard Deck</span>
+    <h2 style="font-family:'Fraunces',serif;font-weight:900;font-size:clamp(24px,4vw,40px);margin-top:8px;margin-bottom:24px">The Cards Nobody Deals</h2>
+    <div style="overflow-x:auto;border:2px solid var(--border);border-radius:var(--radius)">
+      <table class="wild-table">
+        <thead><tr><th>Card</th><th>The Uncomfortable Prompt</th></tr></thead>
+        <tbody>
+          <tr><td>💰 The Money Card</td><td>Pull up your bank statement. Classify every transaction as: <em>Survival, Pleasure, or Others.</em> What does the ratio say about what you value?</td></tr>
+          <tr><td>😤 The Anger Card</td><td>Name something you're pretending not to be angry about. Say it out loud. Then ask: what's underneath it?</td></tr>
+          <tr><td>😒 The Envy Card</td><td>Text someone you secretly envy and genuinely compliment something in their life. Mean it. Notice what that costs you.</td></tr>
+          <tr><td>💀 The Mortality Card</td><td>Set a 5-minute timer. Sit with the fact that you and everyone you love will die. Don't escape it. Let it land. Then ask: <em>What matters now?</em></td></tr>
+          <tr><td>❓ The Doubt Card</td><td>Write God a letter that begins: "I don't understand why you..." Don't edit. Don't explain. Don't apologize. Just write.</td></tr>
+          <tr><td>🪞 The Body Card</td><td>Stand in front of a mirror for 60 seconds without judgment. Just see yourself as God sees you — made deliberately, on purpose, not by accident.</td></tr>
+          <tr><td>📱 The Digital Card</td><td>Leave your phone in another room for 4 hours. Note the withdrawal symptoms. They are information.</td></tr>
+          <tr><td>⚖️ The Justice Card</td><td>Research one injustice in your city you know nothing about. Spend 30 minutes learning. Then ask: <em>What does my faith require of me here?</em></td></tr>
+          <tr><td>🌑 The Shadow Card</td><td>Complete this sentence: "The version of me I work hardest to hide is ____." Don't skip it. This is where healing lives.</td></tr>
+          <tr><td>🗳️ The Politics Card</td><td>Name one view held by the political "other side" that you think has some genuine biblical merit. Say it out loud.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM LINE OF THE AUDIT -->
+<div style="padding:60px 40px;border-top:2px solid var(--border);background:var(--ink);color:var(--bg);position:relative;z-index:2;overflow:hidden">
+  <div style="position:absolute;inset:0;background:radial-gradient(ellipse 40% 60% at 0% 50%,var(--accent1)22,transparent)"></div>
+  <div style="max-width:700px;margin:0 auto;text-align:center;position:relative">
+    <div style="font-size:40px;margin-bottom:16px">🏁</div>
+    <h2 style="font-family:'Fraunces',serif;font-weight:900;font-size:clamp(24px,4vw,40px);margin-bottom:20px">Bottom Line of the Audit</h2>
+    <p style="font-size:15px;line-height:1.9;color:#c8b89a">The original playbook covered what makes people nod. <strong style="color:var(--bg)">This expansion covers what makes people honest.</strong> The Bible is not a self-help book with a cross on the cover. It's a document that survived precisely because it refused to look away from the hardest things human beings face — money, desire, envy, doubt, death, injustice, and the terrifying silence of God. The only question is whether you're willing to read it that way.</p>
+    <div style="margin-top:12px;font-size:11px;color:#6b5a4a;letter-spacing:2px">📅 Audit completed May 21, 2026. All claims cross-referenced against minimum 4 independent sources.</div>
+    <div style="margin-top:32px;display:flex;gap:16px;justify-content:center;flex-wrap:wrap">
+      <a href="playbook.html" style="padding:14px 28px;background:var(--accent1);color:#fff;border-radius:100px;text-decoration:none;font-size:12px;letter-spacing:2px;text-transform:uppercase;font-family:'Space Mono',monospace">Next: Deep Dive →</a>
+      <a href="cards.html" style="padding:14px 28px;border:2px solid var(--bg);border-radius:100px;text-decoration:none;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--bg);font-family:'Space Mono',monospace">Draw a Card</a>
+    </div>
+  </div>
+</div>
+
+<script>
+const cursor=document.getElementById('cursor'),dot=document.getElementById('cursorDot');
+let mx=0,my=0,cx=0,cy=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;dot.style.left=mx+'px';dot.style.top=my+'px'});
+(function anim(){cx+=(mx-cx)*0.15;cy+=(my-cy)*0.15;cursor.style.left=cx+'px';cursor.style.top=cy+'px';requestAnimationFrame(anim)})();
+document.querySelectorAll('a,button').forEach(el=>{el.addEventListener('mouseenter',()=>cursor.classList.add('hover'));el.addEventListener('mouseleave',()=>cursor.classList.remove('hover'))});
+const dm=document.getElementById('dmToggle');
+document.documentElement.setAttribute('data-theme',localStorage.getItem('sq-theme')||'light');
+dm.onclick=()=>{const t=document.documentElement.getAttribute('data-theme')==='light'?'dark':'light';document.documentElement.setAttribute('data-theme',t);localStorage.setItem('sq-theme',t)};
+// NAV BURGER
+const burger=document.getElementById('navBurger'),mobileNav=document.getElementById('navMobile');if(burger&&mobileNav){burger.addEventListener('click',()=>{const o=mobileNav.classList.toggle('open');burger.classList.toggle('open');burger.setAttribute('aria-expanded',o)});mobileNav.querySelectorAll('.nav-link').forEach(l=>l.addEventListener('click',()=>{mobileNav.classList.remove('open');burger.classList.remove('open');burger.setAttribute('aria-expanded',false)}))}
+
+// TABS
+const themeMap={'money':'panel-money','sex':'panel-sex','anger':'panel-anger','burn':'panel-burn','dig':'panel-dig','doubt':'panel-doubt','just':'panel-just','death':'panel-death','wait':'panel-wait','expwild':'panel-expwild'};
+document.querySelectorAll('.theme-tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    document.querySelectorAll('.theme-tab').forEach(t=>t.classList.remove('active'));
+    tab.classList.add('active');
+    Object.values(themeMap).forEach(pid=>{const p=document.getElementById(pid);if(p)p.style.display='none'});
+    const pid=themeMap[tab.dataset.themeId];if(pid){const p=document.getElementById(pid);if(p)p.style.display='block'}
+    playClick();
+  });
+});
+
+function makeCarousel(trackId,prevId,nextId,countId){
+  const track=document.getElementById(trackId),prev=document.getElementById(prevId),next=document.getElementById(nextId),count=document.getElementById(countId);
+  if(!track||!prev||!next)return;
+  const cards=track.querySelectorAll('.card');let idx=0;const total=cards.length;
+  function go(n){idx=(n+total)%total;track.style.transform=`translateX(-${idx*100}%)`;if(count)count.textContent=`${idx+1} / ${total}`;}
+  prev.onclick=()=>{go(idx-1);playClick()};next.onclick=()=>{go(idx+1);playClick()};
+}
+makeCarousel('mtrack','mprev','mnext','mcount');
+makeCarousel('strack','sprev','snext','scount');
+makeCarousel('atrack','aprev','anext','acount');
+makeCarousel('btrack','bprev','bnext','bcount');
+makeCarousel('dtrack','dprev','dnext','dcount');
+makeCarousel('do2track','do2prev','do2next','do2count');
+makeCarousel('jtrack','jprev','jnext','jcount');
+makeCarousel('de2track','de2prev','de2next','de2count');
+makeCarousel('wtrack2','wprev2','wnext2','wcount2');
+
+// GAPS CAROUSEL
+(function(){const track=document.getElementById('gaps-track'),prev=document.getElementById('gaps-prev'),next=document.getElementById('gaps-next'),count=document.getElementById('gaps-count'),label=document.getElementById('gaps-label');if(!track||!prev||!next)return;const items=track.children;let idx=0;const total=items.length;function go(n){idx=(n+total)%total;track.style.transform=`translateX(-${idx*100}%)`;if(count)count.textContent=`${idx+1} / ${total}`;if(label)label.textContent=idx+1;}prev.onclick=()=>{go(idx-1);playClick()};next.onclick=()=>{go(idx+1);playClick()};let sx=0;track.parentElement.addEventListener('touchstart',e=>{sx=e.touches[0].clientX},{passive:true});track.parentElement.addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>40){dx<0?go(idx+1):go(idx-1)}},{passive:true})})();
+
+document.querySelectorAll('.card-flip-btn').forEach(btn=>{btn.addEventListener('click',()=>{btn.textContent=btn.textContent==='Reflect ✦'?'Done. 🙌':'Reflect ✦';playBing()})});
+
+var audioCtx;
+function playClick(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.connect(g);g.connect(audioCtx.destination);o.frequency.setValueAtTime(500,audioCtx.currentTime);o.frequency.exponentialRampToValueAtTime(200,audioCtx.currentTime+0.07);g.gain.setValueAtTime(0.07,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.07);o.start();o.stop(audioCtx.currentTime+0.07)}
+function playBing(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.connect(g);g.connect(audioCtx.destination);o.type='sine';o.frequency.setValueAtTime(880,audioCtx.currentTime);o.frequency.exponentialRampToValueAtTime(1320,audioCtx.currentTime+0.1);g.gain.setValueAtTime(0.08,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.3);o.start();o.stop(audioCtx.currentTime+0.3)}
+</script>
+</body>
+</html>

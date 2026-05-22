@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SOULQUEST — The Bible Playbook Adventure</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Space+Mono:wght@400;700&family=Fraunces:ital,wght@0,100;0,900;1,700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5f0e8;
+    --surface: #ffffff;
+    --surface2: #fff8ee;
+    --ink: #1a1207;
+    --ink2: #4a3f2f;
+    --accent1: #ff4d1c;
+    --accent2: #ffd600;
+    --accent3: #00c896;
+    --accent4: #7c3aed;
+    --accent5: #ff6b9d;
+    --border: #1a1207;
+    --shadow: rgba(26,18,7,0.15);
+    --card-h: 420px;
+    --radius: 20px;
+    --transition: cubic-bezier(0.34,1.56,0.64,1);
+  }
+  [data-theme="dark"] {
+    --bg: #0e0c09;
+    --surface: #1c1812;
+    --surface2: #251f14;
+    --ink: #f5f0e8;
+    --ink2: #c8b89a;
+    --accent1: #ff6040;
+    --accent2: #ffe040;
+    --accent3: #00e8a8;
+    --accent4: #a855f7;
+    --accent5: #ff80b0;
+    --border: #f5f0e8;
+    --shadow: rgba(0,0,0,0.5);
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:'Space Mono',monospace;
+    background:var(--bg);
+    color:var(--ink);
+    overflow-x:hidden;
+    cursor:none;
+    transition:background .4s,color .4s;
+  }
+  /* CUSTOM CURSOR */
+  .cursor{
+    position:fixed;width:20px;height:20px;
+    border:2px solid var(--accent1);
+    border-radius:50%;pointer-events:none;
+    z-index:99999;transform:translate(-50%,-50%);
+    transition:width .15s,height .15s,border-color .15s;
+    mix-blend-mode:multiply;
+  }
+  [data-theme="dark"] .cursor{mix-blend-mode:screen}
+  .cursor-dot{
+    position:fixed;width:6px;height:6px;
+    background:var(--accent1);border-radius:50%;
+    pointer-events:none;z-index:99999;
+    transform:translate(-50%,-50%);
+  }
+  .cursor.hover{width:44px;height:44px;border-color:var(--accent2)}
+  /* NOISE OVERLAY */
+  body::before{
+    content:'';position:fixed;inset:0;
+    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events:none;z-index:1;opacity:0.5;
+  }
+  /* DARK MODE TOGGLE */
+  .dm-toggle{
+    position:fixed;top:20px;right:20px;z-index:1000;
+    width:52px;height:28px;background:var(--ink);
+    border-radius:14px;cursor:pointer;border:none;
+    display:flex;align-items:center;padding:3px;
+    transition:background .3s;
+  }
+  .dm-toggle::after{
+    content:'';width:22px;height:22px;
+    background:var(--bg);border-radius:50%;
+    transition:transform .3s var(--transition);
+  }
+  [data-theme="dark"] .dm-toggle::after{transform:translateX(24px)}
+  /* HERO */
+  .hero{
+    min-height:100vh;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;
+    position:relative;overflow:hidden;
+    padding:40px 20px;
+    z-index:2;
+  }
+  .hero-bg{
+    position:absolute;inset:0;
+    background:
+      radial-gradient(ellipse 80% 60% at 20% 30%,var(--accent2)33,transparent 60%),
+      radial-gradient(ellipse 60% 80% at 80% 70%,var(--accent5)22,transparent 60%),
+      radial-gradient(ellipse 50% 50% at 50% 10%,var(--accent3)22,transparent 50%),
+      var(--bg);
+    animation:bgshift 8s ease-in-out infinite alternate;
+  }
+  @keyframes bgshift{
+    0%{filter:hue-rotate(0deg)}
+    100%{filter:hue-rotate(30deg)}
+  }
+  .hero-badge{
+    font-family:'Space Mono',monospace;font-size:10px;
+    letter-spacing:4px;text-transform:uppercase;
+    border:2px solid var(--border);padding:6px 16px;
+    border-radius:100px;
+    background:var(--surface);
+    animation:floatbadge 3s ease-in-out infinite;
+    margin-bottom:24px;position:relative;z-index:2;
+  }
+  @keyframes floatbadge{
+    0%,100%{transform:translateY(0)}
+    50%{transform:translateY(-6px)}
+  }
+  .hero-title{
+    font-family:'Fraunces',serif;font-weight:900;
+    font-size:clamp(72px,16vw,180px);
+    line-height:0.88;text-align:center;
+    position:relative;z-index:2;
+    letter-spacing:-4px;
+    background:linear-gradient(135deg,var(--ink) 0%,var(--accent1) 40%,var(--accent4) 80%);
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+    background-clip:text;
+    animation:titlerev 1s var(--transition) both;
+  }
+  @keyframes titlerev{
+    from{opacity:0;transform:translateY(40px) scale(0.9)}
+    to{opacity:1;transform:translateY(0) scale(1)}
+  }
+  .hero-sub{
+    font-family:'Syne',sans-serif;font-weight:400;
+    font-size:clamp(14px,2.5vw,20px);
+    text-align:center;max-width:600px;
+    color:var(--ink2);margin-top:16px;
+    position:relative;z-index:2;
+    animation:titlerev 1s .2s var(--transition) both;
+  }
+  .hero-quote{
+    font-family:'Fraunces',serif;font-style:italic;
+    font-size:clamp(14px,2vw,18px);
+    max-width:500px;text-align:center;
+    margin-top:28px;padding:20px 24px;
+    border-left:4px solid var(--accent1);
+    background:var(--surface);
+    border-radius:0 var(--radius) var(--radius) 0;
+    position:relative;z-index:2;
+    animation:titlerev 1s .3s var(--transition) both;
+  }
+  /* FLOATING ELEMENTS */
+  .floater{
+    position:absolute;border-radius:50%;
+    animation:orbit 6s ease-in-out infinite;
+    pointer-events:none;
+  }
+  @keyframes orbit{
+    0%,100%{transform:translate(0,0) rotate(0deg) scale(1)}
+    33%{transform:translate(20px,-30px) rotate(120deg) scale(1.1)}
+    66%{transform:translate(-15px,20px) rotate(240deg) scale(0.9)}
+  }
+  /* MODULE NAV GRID */
+  .modules{
+    padding:80px 40px;position:relative;z-index:2;
+    max-width:1400px;margin:0 auto;
+  }
+  .modules-label{
+    font-size:11px;letter-spacing:5px;text-transform:uppercase;
+    color:var(--ink2);margin-bottom:40px;text-align:center;
+  }
+  .modules-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    gap:24px;
+  }
+  .module-card{
+    height:360px;border:2px solid var(--border);
+    border-radius:var(--radius);
+    background:var(--surface);
+    padding:32px;display:flex;flex-direction:column;
+    justify-content:space-between;
+    cursor:pointer;text-decoration:none;color:var(--ink);
+    position:relative;overflow:hidden;
+    transition:transform .3s var(--transition),box-shadow .3s;
+    box-shadow:6px 6px 0 var(--border);
+  }
+  .module-card::before{
+    content:'';position:absolute;inset:0;
+    opacity:0;transition:opacity .3s;
+    border-radius:calc(var(--radius) - 2px);
+  }
+  .module-card:hover{
+    transform:translate(-4px,-4px);
+    box-shadow:10px 10px 0 var(--border);
+  }
+  .module-card:hover::before{opacity:1}
+  .module-card.m1::before{background:linear-gradient(135deg,var(--accent2)44,transparent)}
+  .module-card.m2::before{background:linear-gradient(135deg,var(--accent1)33,transparent)}
+  .module-card.m3::before{background:linear-gradient(135deg,var(--accent3)33,transparent)}
+  .module-card.m4::before{background:linear-gradient(135deg,var(--accent4)22,transparent)}
+  .module-card.m5::before{background:linear-gradient(135deg,var(--accent5)33,transparent)}
+  .module-icon{
+    font-size:52px;display:block;
+    animation:wobble 3s ease-in-out infinite;
+  }
+  @keyframes wobble{
+    0%,100%{transform:rotate(-5deg)}
+    50%{transform:rotate(5deg)}
+  }
+  .module-num{
+    font-family:'Space Mono',monospace;font-size:10px;
+    letter-spacing:3px;text-transform:uppercase;
+    color:var(--ink2);
+  }
+  .module-title{
+    font-family:'Fraunces',serif;font-weight:900;
+    font-size:28px;line-height:1.1;
+    position:relative;z-index:1;
+  }
+  .module-desc{
+    font-size:12px;color:var(--ink2);
+    line-height:1.6;position:relative;z-index:1;
+  }
+  .module-cta{
+    display:inline-flex;align-items:center;gap:8px;
+    font-size:12px;letter-spacing:2px;text-transform:uppercase;
+    font-weight:700;color:var(--ink);
+    position:relative;z-index:1;
+  }
+  .module-cta .arrow{
+    display:inline-block;transition:transform .3s var(--transition);
+  }
+  .module-card:hover .arrow{transform:translateX(8px)}
+  /* QUOTE OF THE DAY */
+  .qotd-section{
+    padding:60px 40px;
+    background:var(--ink);color:var(--bg);
+    position:relative;z-index:2;overflow:hidden;
+  }
+  .qotd-section::before{
+    content:'';position:absolute;inset:0;
+    background:
+      radial-gradient(ellipse 40% 60% at 0% 50%,var(--accent2)22,transparent),
+      radial-gradient(ellipse 30% 40% at 100% 0%,var(--accent5)22,transparent);
+  }
+  .qotd-inner{max-width:900px;margin:0 auto;position:relative;z-index:1}
+  .qotd-label{
+    font-size:10px;letter-spacing:5px;text-transform:uppercase;
+    color:var(--accent2);margin-bottom:20px;display:block;
+  }
+  .qotd-text{
+    font-family:'Fraunces',serif;font-style:italic;
+    font-size:clamp(22px,4vw,42px);
+    line-height:1.25;font-weight:700;
+  }
+  .qotd-attr{
+    margin-top:20px;font-size:12px;letter-spacing:2px;
+    color:var(--accent3);text-transform:uppercase;
+  }
+  /* RAPID FIRE PREVIEW */
+  .rf-section{
+    padding:60px 40px;position:relative;z-index:2;
+    max-width:1400px;margin:0 auto;
+  }
+  .section-header{
+    display:flex;align-items:center;justify-content:space-between;
+    margin-bottom:32px;
+  }
+  .section-title{
+    font-family:'Fraunces',serif;font-weight:900;
+    font-size:clamp(28px,5vw,48px);
+  }
+  .btn-pill{
+    display:inline-flex;align-items:center;gap:6px;
+    padding:10px 22px;border-radius:100px;
+    border:2px solid var(--border);background:var(--surface);
+    color:var(--ink);font-family:'Space Mono',monospace;
+    font-size:11px;letter-spacing:2px;text-transform:uppercase;
+    cursor:pointer;text-decoration:none;
+    transition:all .3s var(--transition);
+  }
+  .btn-pill:hover{background:var(--ink);color:var(--bg)}
+  /* STATS BAND */
+  .stats{
+    padding:40px;border-top:2px solid var(--border);
+    border-bottom:2px solid var(--border);
+    display:flex;flex-wrap:wrap;gap:0;
+    position:relative;z-index:2;
+  }
+  .stat{
+    flex:1;min-width:150px;padding:20px 32px;
+    border-right:2px solid var(--border);
+    text-align:center;
+  }
+  .stat:last-child{border-right:none}
+  .stat-num{
+    font-family:'Fraunces',serif;font-weight:900;
+    font-size:48px;line-height:1;
+    background:linear-gradient(135deg,var(--accent1),var(--accent4));
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+    background-clip:text;
+  }
+  .stat-label{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--ink2);margin-top:4px}
+  /* SCROLLING TICKER */
+  .ticker{
+    overflow:hidden;padding:16px 0;
+    background:var(--accent1);color:#fff;
+    border-top:2px solid var(--border);
+    border-bottom:2px solid var(--border);
+    position:relative;z-index:2;
+  }
+  .ticker-inner{
+    display:flex;white-space:nowrap;
+    animation:ticker 30s linear infinite;
+    font-family:'Fraunces',serif;font-style:italic;
+    font-size:18px;font-weight:700;
+  }
+  @keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+  .ticker-item{padding:0 40px}
+  /* FOOTER */
+  footer{
+    padding:40px;border-top:2px solid var(--border);
+    display:flex;flex-wrap:wrap;gap:20px;
+    align-items:center;justify-content:space-between;
+    position:relative;z-index:2;
+    font-size:12px;color:var(--ink2);
+  }
+  footer a{color:var(--ink2);text-decoration:none}
+  /* ENTRANCE ANIMATIONS */
+  .reveal{opacity:0;transform:translateY(30px);transition:opacity .6s,transform .6s var(--transition)}
+  .reveal.visible{opacity:1;transform:translateY(0)}
+</style>
+</head>
+<body>
+<div class="cursor" id="cursor"></div>
+<div class="cursor-dot" id="cursorDot"></div>
+<button class="dm-toggle" id="dmToggle" aria-label="Toggle dark mode"></button>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+
+  <!-- floating blobs -->
+  <div class="floater" style="width:120px;height:120px;background:var(--accent2);opacity:0.35;top:10%;left:5%;animation-delay:-2s"></div>
+  <div class="floater" style="width:80px;height:80px;background:var(--accent5);opacity:0.3;top:20%;right:8%;animation-delay:-1s;animation-duration:4s"></div>
+  <div class="floater" style="width:60px;height:60px;background:var(--accent3);opacity:0.35;bottom:20%;left:12%;animation-delay:-3s"></div>
+  <div class="floater" style="width:100px;height:100px;background:var(--accent4);opacity:0.25;bottom:15%;right:5%;animation-duration:7s"></div>
+
+  <div class="hero-badge">✦ Bible · Playbook · Adventure ✦</div>
+  <h1 class="hero-title">SOUL<br>QUEST</h1>
+  <p class="hero-sub">A "We're Not Really Strangers" Scripture Playbook — where ancient wisdom meets real life, gamified for your soul's adventure.</p>
+  <blockquote class="hero-quote" id="heroQuote">
+    Loading today's spark...
+  </blockquote>
+  <div style="margin-top:40px;display:flex;gap:16px;flex-wrap:wrap;justify-content:center;position:relative;z-index:2">
+    <a href="level1.html" class="btn-pill" style="background:var(--accent1);color:#fff;border-color:var(--accent1);font-size:13px;padding:14px 32px">⚡ Start Your Quest</a>
+    <a href="cards.html" class="btn-pill">🃏 Draw a Card</a>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats reveal">
+  <div class="stat"><div class="stat-num">31</div><div class="stat-label">Cards Total</div></div>
+  <div class="stat"><div class="stat-num">5</div><div class="stat-label">Levels</div></div>
+  <div class="stat"><div class="stat-num">8</div><div class="stat-label">Life Themes</div></div>
+  <div class="stat"><div class="stat-num">200+</div><div class="stat-label">Questions</div></div>
+</div>
+
+<!-- TICKER -->
+<div class="ticker" aria-hidden="true">
+  <div class="ticker-inner" id="tickerInner">
+    <span class="ticker-item">Identity · Emotions · Relationships · Friendship · Dating · Family · Work · Money · Conflict · Wisdom · Suffering · Addiction · Doubt · Burnout · Justice · Death</span>
+    <span class="ticker-item">✦ "You are fearfully and wonderfully made." — Psalm 139:14 ✦</span>
+    <span class="ticker-item">Identity · Emotions · Relationships · Friendship · Dating · Family · Work · Money · Conflict · Wisdom · Suffering · Addiction · Doubt · Burnout · Justice · Death</span>
+    <span class="ticker-item">✦ "You are fearfully and wonderfully made." — Psalm 139:14 ✦</span>
+  </div>
+</div>
+
+<!-- MODULES -->
+<section class="modules reveal">
+  <p class="modules-label">✦ Choose Your Zone ✦</p>
+  <div class="modules-grid">
+    <a href="level1.html" class="module-card m1">
+      <div>
+        <span class="module-icon">🟡</span>
+        <div class="module-num">Module 01</div>
+      </div>
+      <div>
+        <div class="module-title">The Bible<br>Playbook</div>
+        <p class="module-desc">Cards 1–15. WNRS-style: Perception → Connection → Reflection. The original journey through identity, belonging, and purpose.</p>
+      </div>
+      <div class="module-cta">Enter <span class="arrow">→</span></div>
+    </a>
+
+    <a href="audit.html" class="module-card m2">
+      <div>
+        <span class="module-icon">🔍</span>
+        <div class="module-num">Module 02</div>
+      </div>
+      <div>
+        <div class="module-title">The Critical<br>Audit</div>
+        <p class="module-desc">Cards 16–31. The cards nobody deals. Money, sexuality, anger, burnout, doubt, death — the uncomfortable expansion.</p>
+      </div>
+      <div class="module-cta">Enter <span class="arrow">→</span></div>
+    </a>
+
+    <a href="playbook.html" class="module-card m3">
+      <div>
+        <span class="module-icon">📖</span>
+        <div class="module-num">Module 03</div>
+      </div>
+      <div>
+        <div class="module-title">Deep Dive<br>Playbook</div>
+        <p class="module-desc">15+ themed sections. Identity, emotions, relationships, work, money, conflict, suffering, church — with 200+ questions.</p>
+      </div>
+      <div class="module-cta">Enter <span class="arrow">→</span></div>
+    </a>
+
+    <a href="hardlife.html" class="module-card m4">
+      <div>
+        <span class="module-icon">🔥</span>
+        <div class="module-num">Module 04</div>
+      </div>
+      <div>
+        <div class="module-title">Hard Life<br>Realities</div>
+        <p class="module-desc">Addiction, generational trauma, singleness, illness, aging, spiritual abuse. The 8 hardest human themes.</p>
+      </div>
+      <div class="module-cta">Enter <span class="arrow">→</span></div>
+    </a>
+
+    <a href="cards.html" class="module-card m5">
+      <div>
+        <span class="module-icon">⚡</span>
+        <div class="module-num">Module 05</div>
+      </div>
+      <div>
+        <div class="module-title">Rapid Fire<br>Deck</div>
+        <p class="module-desc">Question of the Day. Rapid Fire mode. Wildcard deck. Quote machine. Daily shuffled. Play solo or with friends.</p>
+      </div>
+      <div class="module-cta">Enter <span class="arrow">→</span></div>
+    </a>
+  </div>
+</section>
+
+<!-- QUOTE OF THE DAY -->
+<section class="qotd-section reveal">
+  <div class="qotd-inner">
+    <span class="qotd-label">✦ Quote of the Day ✦</span>
+    <p class="qotd-text" id="qotdMain">"Loading wisdom..."</p>
+    <p class="qotd-attr" id="qotdSource">—</p>
+    <div style="margin-top:32px">
+      <a href="cards.html" class="btn-pill" style="border-color:var(--accent2);color:var(--accent2)">🎴 Draw Another</a>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT SECTION -->
+<section class="rf-section reveal">
+  <div class="section-header">
+    <h2 class="section-title">What Is<br>SoulQuest?</h2>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px">
+    <div style="padding:32px;border:2px solid var(--border);border-radius:var(--radius);background:var(--surface);box-shadow:4px 4px 0 var(--border)">
+      <div style="font-size:36px;margin-bottom:16px">🧭</div>
+      <h3 style="font-family:'Fraunces',serif;font-size:22px;margin-bottom:12px">The Architecture</h3>
+      <p style="font-size:13px;line-height:1.8;color:var(--ink2)">Based on the "We're Not Really Strangers" game structure by Koreen Odiney — three progressive levels of Perception, Connection, and Reflection — but rooted in Scripture. Each card gives you a Question, a Verse, an Insight, and a Practice.</p>
+    </div>
+    <div style="padding:32px;border:2px solid var(--border);border-radius:var(--radius);background:var(--surface);box-shadow:4px 4px 0 var(--border)">
+      <div style="font-size:36px;margin-bottom:16px">🧬</div>
+      <h3 style="font-family:'Fraunces',serif;font-size:22px;margin-bottom:12px">Use It Any Way</h3>
+      <p style="font-size:13px;line-height:1.8;color:var(--ink2)">Solo journaling or devotional. With a friend or partner — take turns. Small group or Bible study. As daily cards — one card, one day. The WNRS structure works because it warms you up then moves into vulnerability. Don't skip to Level 3. Trust the process.</p>
+    </div>
+    <div style="padding:32px;border:2px solid var(--border);border-radius:var(--radius);background:var(--surface);box-shadow:4px 4px 0 var(--border)">
+      <div style="font-size:36px;margin-bottom:16px">💡</div>
+      <h3 style="font-family:'Fraunces',serif;font-size:22px;margin-bottom:12px">The Goal</h3>
+      <p style="font-size:13px;line-height:1.8;color:var(--ink2)">Use the Bible not only to know what is true, but to become the kind of person who can live truthfully, lovingly, courageously, and humbly in everyday life. Identity is received before it is achieved.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div>
+    <div style="font-family:'Fraunces',serif;font-weight:900;font-size:24px">SOULQUEST</div>
+    <div style="font-size:11px;color:var(--ink2);margin-top:4px">Bible · Playbook · Adventure</div>
+  </div>
+  <div style="display:flex;gap:24px;flex-wrap:wrap">
+    <a href="level1.html">Module 01</a>
+    <a href="audit.html">Module 02</a>
+    <a href="playbook.html">Module 03</a>
+    <a href="hardlife.html">Module 04</a>
+    <a href="cards.html">Module 05</a>
+  </div>
+  <div>📅 Information current as of May 2026.<br>Scripture NIV unless noted.</div>
+</footer>
+
+<script>
+// CURSOR
+const cursor=document.getElementById('cursor'),dot=document.getElementById('cursorDot');
+let mx=0,my=0,cx=0,cy=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;dot.style.left=mx+'px';dot.style.top=my+'px'});
+const interactables=document.querySelectorAll('a,button,.module-card');
+interactables.forEach(el=>{
+  el.addEventListener('mouseenter',()=>cursor.classList.add('hover'));
+  el.addEventListener('mouseleave',()=>cursor.classList.remove('hover'));
+});
+(function animCursor(){
+  cx+=(mx-cx)*0.15;cy+=(my-cy)*0.15;
+  cursor.style.left=cx+'px';cursor.style.top=cy+'px';
+  requestAnimationFrame(animCursor);
+})();
+
+// DARK MODE
+const dmBtn=document.getElementById('dmToggle');
+const stored=localStorage.getItem('sq-theme')||'light';
+document.documentElement.setAttribute('data-theme',stored);
+dmBtn.onclick=()=>{
+  const t=document.documentElement.getAttribute('data-theme')==='light'?'dark':'light';
+  document.documentElement.setAttribute('data-theme',t);
+  localStorage.setItem('sq-theme',t);
+};
+
+// QUOTES
+const quotes=[
+  {text:"The things that make us feel most alone are really what connect us most passionately — and that's our fear of not being enough.",src:"— Dr. Brené Brown"},
+  {text:"You are a chosen people, a royal priesthood, a holy nation, God's special possession.",src:"— 1 Peter 2:9"},
+  {text:"I praise you because I am fearfully and wonderfully made; your works are wonderful, I know that full well.",src:"— Psalm 139:14"},
+  {text:"For we are God's handiwork, created in Christ Jesus to do good works, which God prepared in advance for us to do.",src:"— Ephesians 2:10"},
+  {text:"For I know the plans I have for you, declares the Lord, plans to prosper you and not to harm you, plans to give you hope and a future.",src:"— Jeremiah 29:11"},
+  {text:"The Spirit God gave us does not make us timid, but gives us power, love and self-discipline.",src:"— 2 Timothy 1:7"},
+  {text:"Doubt is not the opposite of faith. Pretending is.",src:"— The Critical Audit"},
+  {text:"But those who hope in the Lord will renew their strength. They will soar on wings like eagles.",src:"— Isaiah 40:31"},
+  {text:"Biblical recovery is not 'try harder.' It is come into the light, receive grace, break agreement with lies, rebuild desire, and walk with others toward freedom.",src:"— The Hard Life Playbook"},
+  {text:"What would love do if it was also wise, holy, honest, and patient?",src:"— The One-Question Discernment Tool"},
+  {text:"The Bible is not shallow about real life. It understands bondage, family wounds, work, suffering, and religious harm with more honesty than many churches do.",src:"— Gp2 Bottom Line"},
+  {text:"Teach us to number our days, that we may gain a heart of wisdom.",src:"— Psalm 90:12"},
+  {text:"Even though I walk through the darkest valley, I will fear no evil, for you are with me.",src:"— Psalm 23:4"},
+  {text:"Vulnerability — which requires courage over comfort — is the birthplace of innovation, creativity, and change.",src:"— Brené Brown research"},
+  {text:"My God, my God, why have you forsaken me?",src:"— Psalm 22:1 / Matthew 27:46"},
+];
+
+// Seed with date for daily consistency
+function getDailyIndex(arr){
+  const d=new Date();
+  const seed=d.getFullYear()*10000+d.getMonth()*100+d.getDate();
+  return seed%arr.length;
+}
+const qi=getDailyIndex(quotes);
+const q=quotes[qi];
+document.getElementById('heroQuote').textContent='"'+q.text+'"';
+const q2=quotes[(qi+7)%quotes.length];
+document.getElementById('qotdMain').textContent='"'+q2.text+'"';
+document.getElementById('qotdSource').textContent=q2.src;
+
+// REVEAL ON SCROLL
+const revEls=document.querySelectorAll('.reveal');
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')});
+},{threshold:0.1});
+revEls.forEach(el=>obs.observe(el));
+
+// SOUNDS — subtle UI click sound via AudioContext
+var audioCtx;
+function playClick(){
+  if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+  const osc=audioCtx.createOscillator();
+  const gain=audioCtx.createGain();
+  osc.connect(gain);gain.connect(audioCtx.destination);
+  osc.frequency.setValueAtTime(600,audioCtx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(200,audioCtx.currentTime+0.08);
+  gain.gain.setValueAtTime(0.08,audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.08);
+  osc.start();osc.stop(audioCtx.currentTime+0.08);
+}
+document.querySelectorAll('a,button').forEach(el=>el.addEventListener('click',playClick));
+</script>
+</body>
+</html>

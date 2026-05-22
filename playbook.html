@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 03 — Deep Dive Playbook | SOULQUEST</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Space+Mono:wght@400;700&family=Fraunces:ital,wght@0,100;0,900;1,700&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#f5f0e8;--surface:#ffffff;--surface2:#fff8ee;--ink:#1a1207;--ink2:#4a3f2f;--accent1:#ff4d1c;--accent2:#ffd600;--accent3:#00c896;--accent4:#7c3aed;--accent5:#ff6b9d;--border:#1a1207;--radius:20px;--transition:cubic-bezier(0.34,1.56,0.64,1);--card-h:460px}
+  [data-theme="dark"]{--bg:#0e0c09;--surface:#1c1812;--surface2:#251f14;--ink:#f5f0e8;--ink2:#c8b89a;--accent1:#ff6040;--accent2:#ffe040;--accent3:#00e8a8;--accent4:#a855f7;--accent5:#ff80b0;--border:#f5f0e8}
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Space Mono',monospace;background:var(--bg);color:var(--ink);overflow-x:hidden;transition:background .4s,color .4s}
+  body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:1;opacity:0.5}
+  .cursor{position:fixed;width:20px;height:20px;border:2px solid var(--accent3);border-radius:50%;pointer-events:none;z-index:99999;transform:translate(-50%,-50%);mix-blend-mode:multiply}
+  [data-theme="dark"] .cursor{mix-blend-mode:screen}
+  .cursor-dot{position:fixed;width:6px;height:6px;background:var(--accent3);border-radius:50%;pointer-events:none;z-index:99999;transform:translate(-50%,-50%)}
+  .cursor.hover{width:40px;height:40px;border-color:var(--accent2)}
+  .dm-toggle{width:44px;height:24px;background:var(--ink);border-radius:12px;cursor:pointer;border:none;display:flex;align-items:center;padding:3px;transition:background .3s;flex-shrink:0}
+  .dm-toggle::after{content:'';width:18px;height:18px;background:var(--bg);border-radius:50%;transition:transform .3s var(--transition)}
+  [data-theme="dark"] .dm-toggle::after{transform:translateX(20px)}
+  nav{position:sticky;top:0;z-index:100;padding:0 clamp(16px,4vw,40px);border-bottom:2px solid var(--border);background:var(--bg);display:flex;align-items:center;justify-content:space-between;min-height:60px;gap:16px;transition:background .4s}
+  .nav-logo{font-family:'Fraunces',serif;font-weight:900;font-size:clamp(16px,4vw,22px);text-decoration:none;color:var(--ink);flex-shrink:0}
+  .nav-right{display:flex;align-items:center;gap:12px}
+  .nav-links{display:flex;gap:clamp(10px,2vw,20px);align-items:center}
+  .nav-link{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--ink2);text-decoration:none;transition:color .2s;white-space:nowrap}
+  .nav-link:hover,.nav-link.active{color:var(--accent3)}
+  .nav-burger{display:none;flex-direction:column;justify-content:center;gap:5px;width:36px;height:36px;cursor:pointer;background:transparent;border:none;padding:7px;flex-shrink:0}
+  .nav-burger span{display:block;width:100%;height:2px;background:var(--ink);border-radius:2px;transition:transform .3s,opacity .3s}
+  .nav-burger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+  .nav-burger.open span:nth-child(2){opacity:0}
+  .nav-burger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+  .nav-mobile{display:none;position:absolute;top:100%;left:0;right:0;background:var(--bg);border-bottom:2px solid var(--border);padding:8px clamp(16px,4vw,40px) 16px;flex-direction:column;z-index:99;transition:background .4s}
+  .nav-mobile.open{display:flex}
+  .nav-mobile .nav-link{font-size:12px;letter-spacing:2px;padding:14px 0;border-bottom:1px solid var(--border);white-space:normal}
+  .nav-mobile .nav-link:last-child{border-bottom:none}
+  @media(max-width:680px){.nav-links{display:none}.nav-burger{display:flex}}
+  /* HERO */
+  .page-hero{padding:60px 40px;background:linear-gradient(135deg,var(--accent3)22,var(--accent4)11,transparent 70%);border-bottom:2px solid var(--border);position:relative;z-index:2}
+  /* SECTION SELECTOR */
+  .section-selector{padding:clamp(20px,3vw,32px) clamp(16px,4vw,40px);border-bottom:2px solid var(--border);position:relative;z-index:2}
+  .section-carousel-wrap{overflow:hidden;border-radius:16px}
+  .section-track{display:flex;transition:transform .5s cubic-bezier(0.25,0.46,0.45,0.94);will-change:transform}
+  .section-btn{min-width:100%;height:160px;padding:28px 32px;border:2px solid var(--border);border-radius:16px;background:var(--surface);cursor:pointer;font-family:'Space Mono',monospace;font-size:15px;letter-spacing:1px;text-align:left;color:var(--ink);transition:background .2s,color .2s,border-color .2s;position:relative;box-sizing:border-box;display:flex;flex-direction:column;justify-content:space-between;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--accent3) transparent}
+  .section-btn::-webkit-scrollbar{width:4px}
+  .section-btn::-webkit-scrollbar-thumb{background:var(--accent3);border-radius:4px}
+  .section-btn.active{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+  .section-btn-icon{display:block;font-size:36px;margin-bottom:0}
+  /* CONTENT */
+  .content-area{position:relative;z-index:2}
+  .section-panel{display:none;padding:48px 40px;border-bottom:2px solid var(--border)}
+  .section-panel.visible{display:block}
+  .section-title{font-family:'Fraunces',serif;font-weight:900;font-size:clamp(28px,5vw,52px);margin-bottom:8px}
+  .section-sub{font-size:13px;color:var(--ink2);max-width:700px;line-height:1.8;margin-bottom:32px;font-style:italic}
+  /* CAROUSEL */
+  .carousel-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+  .carousel-title{font-family:'Fraunces',serif;font-weight:700;font-size:20px}
+  .carousel-nav{display:flex;gap:8px;align-items:center}
+  .carousel-btn{width:36px;height:36px;border-radius:50%;border:2px solid var(--border);background:var(--surface);color:var(--ink);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .2s var(--transition)}
+  .carousel-btn:hover{background:var(--ink);color:var(--bg)}
+  .carousel-counter{font-size:11px;letter-spacing:2px;color:var(--ink2);padding:0 6px}
+  .carousel-track-wrap{overflow:hidden;border-radius:var(--radius);border:2px solid var(--border)}
+  .carousel-track{display:flex;transition:transform .5s cubic-bezier(0.25,0.46,0.45,0.94)}
+  /* Q CARD */
+  .q-card{min-width:100%;height:var(--card-h);background:var(--surface);padding:32px;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden}
+  .q-card-inner{overflow-y:auto;flex:1;margin-bottom:12px;padding-right:4px}
+  .q-card-inner::-webkit-scrollbar{width:3px}
+  .q-card-inner::-webkit-scrollbar-thumb{background:var(--accent3);border-radius:3px}
+  .q-num{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--ink2);margin-bottom:10px}
+  .q-text{font-family:'Fraunces',serif;font-style:italic;font-size:clamp(18px,3vw,28px);font-weight:700;line-height:1.3;color:var(--ink);margin-bottom:20px}
+  .scripture-chip{display:inline-flex;gap:6px;align-items:center;padding:6px 14px;border-radius:100px;background:var(--surface2);border:1px solid var(--border);font-size:11px;letter-spacing:1px;margin:4px 4px 0 0;cursor:pointer;color:var(--ink)}
+  .q-footer{display:flex;align-items:center;justify-content:space-between;padding-top:12px;border-top:1px solid var(--border);flex-shrink:0}
+  .q-tag{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--ink2)}
+  .q-btn{padding:8px 20px;border-radius:100px;border:2px solid var(--border);background:transparent;color:var(--ink);font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;cursor:pointer;transition:all .2s var(--transition)}
+  .q-btn:hover{background:var(--accent3);color:var(--ink);border-color:var(--accent3)}
+  /* REFLECTION BOX */
+  .reflection-box{padding:24px;border:2px solid var(--border);border-radius:var(--radius);background:var(--surface2);font-size:13px;line-height:1.8;color:var(--ink2);font-style:italic;margin-top:24px}
+  /* FRAMEWORK */
+  .framework{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-top:24px}
+  .fw-col{padding:20px;border:2px solid var(--border);border-radius:var(--radius);background:var(--surface)}
+  .fw-col-title{font-family:'Fraunces',serif;font-weight:900;font-size:18px;margin-bottom:12px}
+  .fw-item{font-size:12px;line-height:1.6;color:var(--ink2);padding:3px 0;border-bottom:1px solid var(--surface2)}
+  /* BIBLE AS HANDBOOK TABLE */
+  .handbook-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:20px}
+  .handbook-table th{text-align:left;padding:12px 16px;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--ink2);border-bottom:2px solid var(--border);background:var(--surface2)}
+  .handbook-table td{padding:12px 16px;border-bottom:1px solid var(--border);vertical-align:top;line-height:1.5}
+  .handbook-table td:first-child{font-weight:700;color:var(--accent3)}
+  .handbook-table tr:hover td{background:var(--surface2)}
+</style>
+</head>
+<body>
+<div class="cursor" id="cursor"></div>
+<div class="cursor-dot" id="cursorDot"></div>
+<nav>
+  <a href="index.html" class="nav-logo">SOULQUEST</a>
+  <div class="nav-right">
+    <div class="nav-links">
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="level1.html" class="nav-link">Module 01</a>
+      <a href="audit.html" class="nav-link">Module 02</a>
+      <a href="playbook.html" class="nav-link active">Module 03</a>
+      <a href="hardlife.html" class="nav-link">Module 04</a>
+      <a href="cards.html" class="nav-link">Module 05</a>
+    </div>
+    <button class="dm-toggle" id="dmToggle" aria-label="Toggle dark mode"></button>
+    <button class="nav-burger" id="navBurger" aria-label="Toggle menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <div class="nav-mobile" id="navMobile">
+    <a href="index.html" class="nav-link">Home</a>
+    <a href="level1.html" class="nav-link">Module 01</a>
+    <a href="audit.html" class="nav-link">Module 02</a>
+    <a href="playbook.html" class="nav-link active">Module 03</a>
+    <a href="hardlife.html" class="nav-link">Module 04</a>
+    <a href="cards.html" class="nav-link">Module 05</a>
+  </div>
+</nav>
+
+<div class="page-hero">
+  <span style="font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--accent3)">✦ Module 03 · Deep Dive Playbook ✦</span>
+  <h1 style="font-family:'Fraunces',serif;font-weight:900;font-size:clamp(40px,8vw,90px);line-height:0.9;margin-top:12px;margin-bottom:20px">THE DEEP<br>PLAYBOOK</h1>
+  <p style="font-size:13px;color:var(--ink2);max-width:700px;line-height:1.8">A "We're Not Really Strangers"-style guide for deeper conversations, self-reflection, relationships, faith, and real life. <strong>Not about winning Bible trivia.</strong> About using Scripture as a mirror, a map, and a conversation table.</p>
+</div>
+
+<!-- SECTION SELECTOR -->
+<div class="section-selector">
+  <span style="font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--ink2)">✦ Choose a Theme ✦</span>
+  <div class="carousel-header" style="margin-top:16px;margin-bottom:12px">
+    <span style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--ink2)">Theme <span id="theme-label">1</span> of 17</span>
+    <div class="carousel-nav">
+      <button class="carousel-btn" id="theme-prev" aria-label="Previous theme">←</button>
+      <span class="carousel-counter" id="theme-count">1 / 17</span>
+      <button class="carousel-btn" id="theme-next" aria-label="Next theme">→</button>
+    </div>
+  </div>
+  <div class="section-carousel-wrap">
+    <div class="section-track" id="section-track">
+      <button class="section-btn active" data-section="foundation"><span class="section-btn-icon">🧭</span>Foundation</button>
+      <button class="section-btn" data-section="identity"><span class="section-btn-icon">🆔</span>Identity</button>
+      <button class="section-btn" data-section="emotions"><span class="section-btn-icon">💛</span>Emotions</button>
+      <button class="section-btn" data-section="relationships"><span class="section-btn-icon">🤝</span>Relationships</button>
+      <button class="section-btn" data-section="friendship"><span class="section-btn-icon">👬</span>Friendship</button>
+      <button class="section-btn" data-section="dating"><span class="section-btn-icon">💑</span>Dating</button>
+      <button class="section-btn" data-section="family"><span class="section-btn-icon">🏠</span>Family</button>
+      <button class="section-btn" data-section="work"><span class="section-btn-icon">💼</span>Work</button>
+      <button class="section-btn" data-section="money"><span class="section-btn-icon">💰</span>Money</button>
+      <button class="section-btn" data-section="conflict"><span class="section-btn-icon">⚡</span>Conflict</button>
+      <button class="section-btn" data-section="wisdom"><span class="section-btn-icon">🔮</span>Wisdom</button>
+      <button class="section-btn" data-section="suffering"><span class="section-btn-icon">🌧</span>Suffering</button>
+      <button class="section-btn" data-section="spiritual"><span class="section-btn-icon">🕊</span>Disciplines</button>
+      <button class="section-btn" data-section="church"><span class="section-btn-icon">⛪</span>Church</button>
+      <button class="section-btn" data-section="character"><span class="section-btn-icon">🪨</span>Character</button>
+      <button class="section-btn" data-section="framework"><span class="section-btn-icon">🗺</span>Framework</button>
+      <button class="section-btn" data-section="master"><span class="section-btn-icon">⭐</span>Master Qs</button>
+    </div>
+  </div>
+</div>
+
+<div class="content-area">
+
+<!-- FOUNDATION -->
+<div class="section-panel visible" id="panel-foundation">
+  <h2 class="section-title">The Core Idea</h2>
+  <p class="section-sub">Many people approach the Bible in one of three limited ways — Information mode, Instruction mode, or Inspiration mode. All three are useful, but incomplete.</p>
+  <div style="max-width:800px;padding:32px;border:2px solid var(--border);border-radius:var(--radius);background:var(--surface);box-shadow:6px 6px 0 var(--border);margin-bottom:32px">
+    <div style="font-family:'Fraunces',serif;font-size:22px;font-weight:700;margin-bottom:16px">A deeper everyday-life approach asks:</div>
+    <blockquote style="font-family:'Fraunces',serif;font-style:italic;font-size:20px;border-left:4px solid var(--accent3);padding:16px 20px;background:var(--surface2);border-radius:0 12px 12px 0;line-height:1.5">"How does this reveal God, expose the human heart, shape my relationships, correct my desires, guide my decisions, and teach me how to live with others?"</blockquote>
+    <p style="margin-top:16px;font-size:13px;color:var(--ink2);line-height:1.7">The Bible becomes a <strong>life-formation tool</strong>, not just a religious textbook.</p>
+  </div>
+  <h3 style="font-family:'Fraunces',serif;font-weight:900;font-size:28px;margin-bottom:16px">The Bible as a Human-Life Handbook</h3>
+  <div style="overflow-x:auto;border:2px solid var(--border);border-radius:var(--radius)">
+    <table class="handbook-table">
+      <thead><tr><th>Everyday Situation</th><th>Biblical Concern</th></tr></thead>
+      <tbody>
+        <tr><td>Anxiety</td><td>Trust, control, fear, surrender</td></tr>
+        <tr><td>Conflict</td><td>Pride, humility, truth, reconciliation</td></tr>
+        <tr><td>Friendship</td><td>Loyalty, wisdom, boundaries</td></tr>
+        <tr><td>Dating</td><td>Character, desire, covenant, discernment</td></tr>
+        <tr><td>Work</td><td>Diligence, justice, ambition, calling</td></tr>
+        <tr><td>Money</td><td>Stewardship, generosity, idolatry</td></tr>
+        <tr><td>Family</td><td>Honor, forgiveness, generational patterns</td></tr>
+        <tr><td>Leadership</td><td>Servanthood, power, accountability</td></tr>
+        <tr><td>Suffering</td><td>Lament, hope, endurance</td></tr>
+        <tr><td>Success</td><td>Gratitude, humility, temptation</td></tr>
+        <tr><td>Failure</td><td>Repentance, grace, restoration</td></tr>
+        <tr><td>Identity</td><td>Image of God, adoption, calling</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div style="margin-top:28px;padding:20px 24px;border:2px solid var(--border);border-radius:var(--radius);background:var(--surface);font-size:13px;color:var(--ink2);line-height:1.7">
+    <strong>The Bible does not answer every modern question directly</strong>, but it gives the <strong>moral imagination</strong> and <strong>spiritual wisdom</strong> to think clearly.
+  </div>
+  <div style="margin-top:32px">
+    <h3 style="font-family:'Fraunces',serif;font-weight:900;font-size:28px;margin-bottom:16px">How to Use This Playbook</h3>
+    <div style="font-size:13px;line-height:1.9;color:var(--ink2);max-width:700px">
+      <p style="margin-bottom:12px">The best format:</p>
+      <ol style="padding-left:20px;display:flex;flex-direction:column;gap:8px">
+        <li>Pick a theme.</li>
+        <li>Choose 3–5 questions.</li>
+        <li>Read a related Scripture.</li>
+        <li>Answer honestly.</li>
+        <li>Ask: "What is God inviting me to notice?"</li>
+        <li>End with prayer, action, or repentance.</li>
+      </ol>
+      <p style="margin-top:16px;font-weight:700;color:var(--ink)">Do not rush. The goal is not to "finish the cards." The goal is to <em>become more truthful before God and more loving toward people</em>.</p>
+      <p style="margin-top:16px">You can use it: alone for journaling · with a friend · in a dating/courtship setting · in small groups · with church leaders or mentors · with family · for self-examination · for discipleship · for conflict repair · for decision-making · for prayer</p>
+    </div>
+  </div>
+</div>
+
+<!-- IDENTITY -->
+<div class="section-panel" id="panel-identity">
+  <h2 class="section-title">Section A: Identity</h2>
+  <p class="section-sub">"Who am I becoming?" — Core Scriptures: Genesis 1:26–27 · Psalm 139 · 2 Corinthians 5:17 · Ephesians 1 · Galatians 2:20</p>
+  <div class="carousel-header"><div class="carousel-title">15 Questions</div><div class="carousel-nav"><button class="carousel-btn" id="id-prev">←</button><span class="carousel-counter" id="id-count">1 / 15</span><button class="carousel-btn" id="id-next">→</button></div></div>
+  <div class="carousel-track-wrap"><div class="carousel-track" id="id-track"></div></div>
+  <div class="reflection-box">The Bible teaches that identity is received before it is achieved. Before Jesus performed public ministry, the Father declared, "You are my beloved Son." That order matters. Many people live backwards: performing first, hoping to be loved later.</div>
+</div>
+
+<!-- EMOTIONS -->
+<div class="section-panel" id="panel-emotions">
+  <h2 class="section-title">Section B: Emotions</h2>
+  <p class="section-sub">"What is my heart telling me?" — Core Scriptures: Psalms · Proverbs 4:23 · Matthew 26:36–46 · Philippians 4:6–7 · 1 Peter 5:7</p>
+  <div class="carousel-header"><div class="carousel-title">15 Questions</div><div class="carousel-nav"><button class="carousel-btn" id="em-prev">←</button><span class="carousel-counter" id="em-count">1 / 15</span><button class="carousel-btn" id="em-next">→</button></div></div>
+  <div class="carousel-track-wrap"><div class="carousel-track" id="em-track"></div></div>
+  <div class="reflection-box">Biblical faith is not emotional denial. The Psalms are full of grief, anger, confusion, fear, joy, gratitude, and longing. Spiritual maturity is not pretending to be okay. It is learning to bring the whole heart before God truthfully.</div>
+</div>
+
+<!-- RELATIONSHIPS -->
+<div class="section-panel" id="panel-relationships">
+  <h2 class="section-title">Section C: Relationships</h2>
+  <p class="section-sub">"How do I love people well?" — Core Scriptures: John 13:34–35 · Romans 12 · 1 Corinthians 13 · Ephesians 4:29–32 · Colossians 3:12–14</p>
+  <div class="carousel-header"><div class="carousel-title">15 Questions</div><div class="carousel-nav"><button class="carousel-btn" id="rel-prev">←</button><span class="carousel-counter" id="rel-count">1 / 15</span><button class="carousel-btn" id="rel-next">→</button></div></div>
+  <div class="carousel-track-wrap"><div class="carousel-track" id="rel-track"></div></div>
+  <div class="reflection-box">Biblical love is not mere warmth. It is patient, truthful, sacrificial, wise, and holy. Love does not mean having no boundaries. It also does not mean avoiding hard conversations.</div>
+</div>
+
+<!-- FRIENDSHIP -->
+<div class="section-panel" id="panel-friendship">
+  <h2 class="section-title">Section D: Friendship</h2>
+  <p class="section-sub">"Who walks with me?" — Core Scriptures: Proverbs 17:17 · Proverbs 27:6 · Proverbs 27:17 · Ecclesiastes 4:9–12 · John 15:13–15</p>
+  <div class="carousel-header"><div class="carousel-title">15 Questions</div><div class="carousel-nav"><button class="carousel-btn" id="fr-prev">←</button><span class="carousel-counter" id="fr-count">1 / 15</span><button class="carousel-btn" id="fr-next">→</button></div></div>
+  <div class="carousel-track-wrap"><div class="carousel-track" id="fr-track"></div></div>
+  <div class="reflection-box">Friendship is one of God's ordinary tools of formation. The wrong friends normalize foolishness. Wise friends help you see yourself clearly without destroying you.</div>
+</div>
+
+<!-- DATING -->
+<div class="section-panel" id="panel-dating">
+  <h2 class="section-title">Section E: Dating, Marriage & Romantic Discernment</h2>
+  <p class="section-sub">Core Scriptures: Genesis 2:18–25 · Song of Songs · 1 Corinthians 13 · Ephesians 5:21–33 · 2 Corinthians 6:14</p>
+  <div class="carousel-header"><div class="carousel-title">15 Questions</div><div class="carousel-nav"><button class="carousel-btn" id="dt-prev">←</button><span class="carousel-counter" id="dt-count">1 / 15</span><button class="carousel-btn" id="dt-next">→</button></div></div>
+  <div class="carousel-track-wrap"><div class="carousel-track" id="dt-track"></div></div>
+  <div class="reflection-box">Christian dating advice can become shallow when it only says, "Find someone who loves God." That is true but incomplete. You also need to examine emotional maturity, conflict style, teachability, humility, financial wisdom, family patterns, sexual integrity, communication, and shared calling. A person can know Bible verses and still be unsafe, proud, avoidant, controlling, or immature.</div>
+</div>
+
+<!-- FAMILY -->
+<div class="section-panel" id="panel-family">
+  <h2 class="section-title">Section F: Family & Generational Patterns</h2>
+  <p class="section-sub">Core Scriptures: Exodus 20:12 · Deuteronomy 6:4–9 · Psalm 27:10 · Luke 15 · Ephesians 6:1–4</p>
+  <div class="carousel-header"><div class="carousel-title">15 Questions</div><div class="carousel-nav"><button class="carousel-btn" id="fam-prev">←</button><span class="carousel-counter" id="fam-count">1 / 15</span><button class="carousel-btn" id="fam-next">→</button></div></div>
+  <div class="carousel-track-wrap"><div class="carousel-track" id="fam-track"></div></div>
+  <div class="reflection-box">The Bible honors family, but it does not idolize family. Some people need to learn faithfulness inside family obligations. Others need to learn that boundaries can be an act of wisdom, not rebellion.</div>
+</div>
+
+<!-- WORK -->
+<div class="section-panel" id="panel-work">
+  <h2 class="section-title">Section G: Work, Ambition & Calling</h2>
+  <p class="section-sub">Core Scriptures: Genesis 2:15 · Proverbs 16:3 · Ecclesiastes · Colossians 3:23 · Matthew 25:14–30</p>
+  <div class="carousel-header"><div class="carousel-title">15 Questions</div><div class="carousel-nav"><button class="carousel-btn" id="wk-prev">←</button><span class="carousel-counter" id="wk-count">1 / 15</span><button class="carousel-btn" id="wk-next">→</button></div></div>
+  <div class="carousel-track-wrap"><div class="carousel-track" id="wk-track"></div></div>
+  <div class="reflection-box">A biblical view is deeper: work matters, but it is not your savior. Ambition can be holy when it serves God and people. It becomes idolatry when it demands your soul.</div>
+</div>
+
+<!-- MONEY -->
+<div class="section-panel" id="panel-money">
+  <h2 class="section-title">Section H: Money, Possessions & Contentment</h2>
+  <p class="section-sub">Core Scriptures: Proverbs 30:8–9 · Matthew 6:19–34 · Luke 12:13–21 · 1 Timothy 6:6–10 · 2 Corinthians 9:6–8</p>
+  <div class="carousel-header"><div class="carousel-title">15 Questions</div><div class="carousel-nav"><button class="carousel-btn" id="mn-prev">←</button><span class="carousel-counter" id="mn-count">1 / 15</span><button class="carousel-btn" id="mn-next">→</button></div></div>
+  <div class="carousel-track-wrap"><div class="carousel-track" id="mn-track"></div></div>
+  <div class="reflection-box">Money is never just money. It reveals trust, fear, desire, status, generosity, and control. Jesus spoke so often about money because money competes for the heart.</div>
+</div>
+
+<!-- CONFLICT -->
+<div class="section-panel" id="panel-conflict">
+  <h2 class="section-title">Section I: Conflict, Apology & Reconciliation</h2>
+  <p class="section-sub">Core Scriptures: Matthew 5:23–24 · Matthew 18:15–17 · Romans 12:18 · James 1:19–20 · Ephesians 4:26–32</p>
+  <div class="carousel-header"><div class="carousel-title">15 Questions</div><div class="carousel-nav"><button class="carousel-btn" id="cf-prev">←</button><span class="carousel-counter" id="cf-count">1 / 15</span><button class="carousel-btn" id="cf-next">→</button></div></div>
+  <div class="carousel-track-wrap"><div class="carousel-track" id="cf-track"></div></div>
+  <div class="reflection-box"><strong>Forgiveness</strong> releases vengeance. <strong>Reconciliation</strong> requires mutual willingness. <strong>Trust</strong> requires proven change over time. The Bible calls Christians to forgive. It does not require foolishly trusting unrepentant or unsafe people.</div>
+</div>
+
+<!-- WISDOM -->
+<div class="section-panel" id="panel-wisdom">
+  <h2 class="section-title">Section J: Wisdom & Decision-Making</h2>
+  <p class="section-sub">Core Scriptures: Proverbs 3:5–6 · James 1:5 · Psalm 119:105 · Proverbs 11:14 · Philippians 1:9–10</p>
+  <div class="carousel-header"><div class="carousel-title">15 Questions</div><div class="carousel-nav"><button class="carousel-btn" id="ws-prev">←</button><span class="carousel-counter" id="ws-count">1 / 15</span><button class="carousel-btn" id="ws-next">→</button></div></div>
+  <div class="carousel-track-wrap"><div class="carousel-track" id="ws-track"></div></div>
+  <div class="reflection-box">Not every decision has a dramatic sign from heaven. Often, wisdom comes through Scripture, prayer, counsel, character, timing, circumstances, and sober judgment.</div>
+</div>
+
+<!-- SUFFERING -->
+<div class="section-panel" id="panel-suffering">
+  <h2 class="section-title">Section K: Suffering, Waiting & Disappointment</h2>
+  <p class="section-sub">Core Scriptures: Job · Psalm 13 · Romans 5:3–5 · 2 Corinthians 4:16–18 · James 1:2–4</p>
+  <div class="carousel-header"><div class="carousel-title">15 Questions</div><div class="carousel-nav"><button class="carousel-btn" id="sf-prev">←</button><span class="carousel-counter" id="sf-count">1 / 15</span><button class="carousel-btn" id="sf-next">→</button></div></div>
+  <div class="carousel-track-wrap"><div class="carousel-track" id="sf-track"></div></div>
+  <div class="reflection-box">Christian suffering language can become harmful when it rushes people into lessons before allowing lament. Not every wound needs an immediate explanation. Sometimes the most biblical response is to sit, weep, pray, and remain present.</div>
+</div>
+
+<!-- SPIRITUAL DISCIPLINES -->
+<div class="section-panel" id="panel-spiritual">
+  <h2 class="section-title">Section L: Spiritual Disciplines Without Legalism</h2>
+  <p class="section-sub">Core Scriptures: Matthew 6 · John 15 · Psalm 1 · Hebrews 10:24–25 · 1 Timothy 4:7–8</p>
+  <div class="carousel-header"><div class="carousel-title">15 Questions</div><div class="carousel-nav"><button class="carousel-btn" id="sd-prev">←</button><span class="carousel-counter" id="sd-count">1 / 15</span><button class="carousel-btn" id="sd-next">→</button></div></div>
+  <div class="carousel-track-wrap"><div class="carousel-track" id="sd-track"></div></div>
+  <div class="reflection-box">Spiritual disciplines are not ways to make God love you. They are ways to create space to receive, obey, and be formed by His love.</div>
+</div>
+
+<!-- CHURCH -->
+<div class="section-panel" id="panel-church">
+  <h2 class="section-title">Section M: Church, Community & Disappointment</h2>
+  <p class="section-sub">Core Scriptures: Acts 2:42–47 · 1 Corinthians 12 · Hebrews 10:24–25 · Galatians 6:1–2 · Ephesians 4:11–16</p>
+  <div class="carousel-header"><div class="carousel-title">15 Questions</div><div class="carousel-nav"><button class="carousel-btn" id="ch-prev">←</button><span class="carousel-counter" id="ch-count">1 / 15</span><button class="carousel-btn" id="ch-next">→</button></div></div>
+  <div class="carousel-track-wrap"><div class="carousel-track" id="ch-track"></div></div>
+  <div class="reflection-box">No church is perfect. But not all flaws are equal. Some are normal human limitations. Others are serious issues involving abuse, manipulation, lack of accountability, false teaching, financial misuse, or spiritual control. Wisdom requires discernment, not cynicism.</div>
+</div>
+
+<!-- CHARACTER -->
+<div class="section-panel" id="panel-character">
+  <h2 class="section-title">Section N: Character & Hidden Life</h2>
+  <p class="section-sub">Core Scriptures: Psalm 51 · Galatians 5:22–23 · Matthew 23 · Luke 6:43–45 · 1 Samuel 16:7</p>
+  <div class="carousel-header"><div class="carousel-title">15 Questions</div><div class="carousel-nav"><button class="carousel-btn" id="ch2-prev">←</button><span class="carousel-counter" id="ch2-count">1 / 15</span><button class="carousel-btn" id="ch2-next">→</button></div></div>
+  <div class="carousel-track-wrap"><div class="carousel-track" id="ch2-track"></div></div>
+  <div class="reflection-box">The hidden life eventually becomes visible. Character is built in repeated unseen choices.</div>
+</div>
+
+<!-- FRAMEWORK -->
+<div class="section-panel" id="panel-framework">
+  <h2 class="section-title">The Master Framework</h2>
+  <p class="section-sub">Every Bible-for-life conversation can use this structure. Five lenses: God, Self, Others, World, Response.</p>
+  <div class="framework">
+    <div class="fw-col">
+      <div class="fw-col-title">A. God</div>
+      <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--ink2);margin-bottom:10px">What does this reveal about God?</div>
+      <div class="fw-item">His character</div><div class="fw-item">His holiness</div><div class="fw-item">His mercy</div><div class="fw-item">His justice</div><div class="fw-item">His patience</div><div class="fw-item">His nearness</div><div class="fw-item">His authority</div><div class="fw-item">His love</div>
+    </div>
+    <div class="fw-col">
+      <div class="fw-col-title">B. Self</div>
+      <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--ink2);margin-bottom:10px">What does this reveal about me?</div>
+      <div class="fw-item">My desires</div><div class="fw-item">My fears</div><div class="fw-item">My motives</div><div class="fw-item">My habits</div><div class="fw-item">My blind spots</div><div class="fw-item">My wounds</div><div class="fw-item">My idols</div><div class="fw-item">My gifts</div>
+    </div>
+    <div class="fw-col">
+      <div class="fw-col-title">C. Others</div>
+      <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--ink2);margin-bottom:10px">What does this teach me about people?</div>
+      <div class="fw-item">How to love</div><div class="fw-item">How to forgive</div><div class="fw-item">How to confront</div><div class="fw-item">How to listen</div><div class="fw-item">How to serve</div><div class="fw-item">How to honor</div><div class="fw-item">How to set boundaries</div>
+    </div>
+    <div class="fw-col">
+      <div class="fw-col-title">D. World</div>
+      <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--ink2);margin-bottom:10px">What does this teach me about life?</div>
+      <div class="fw-item">Power</div><div class="fw-item">Money</div><div class="fw-item">Suffering</div><div class="fw-item">Work</div><div class="fw-item">Justice</div><div class="fw-item">Community</div><div class="fw-item">Temptation</div><div class="fw-item">Wisdom</div>
+    </div>
+    <div class="fw-col">
+      <div class="fw-col-title">E. Response</div>
+      <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--ink2);margin-bottom:10px">What should I do?</div>
+      <div class="fw-item">Repent</div><div class="fw-item">Forgive</div><div class="fw-item">Speak</div><div class="fw-item">Wait</div><div class="fw-item">Act</div><div class="fw-item">Rest</div><div class="fw-item">Confess</div><div class="fw-item">Reconcile</div><div class="fw-item">Give</div><div class="fw-item">Trust</div>
+    </div>
+  </div>
+  <div style="margin-top:40px">
+    <h3 style="font-family:'Fraunces',serif;font-weight:900;font-size:28px;margin-bottom:16px">The One-Question Discernment Tool</h3>
+    <div style="padding:24px 32px;border:2px solid var(--border);border-radius:var(--radius);background:var(--surface);max-width:700px;box-shadow:6px 6px 0 var(--border)">
+      <blockquote style="font-family:'Fraunces',serif;font-style:italic;font-size:22px;font-weight:700;color:var(--ink);line-height:1.4">"What would love do if it was also wise, holy, honest, and patient?"</blockquote>
+      <div style="margin-top:16px;font-size:13px;line-height:1.8;color:var(--ink2)">
+        <p>This avoids common distortions:</p>
+        <ul style="padding-left:20px;margin-top:8px;display:flex;flex-direction:column;gap:4px">
+          <li>Love without wisdom becomes enabling.</li>
+          <li>Wisdom without love becomes coldness.</li>
+          <li>Holiness without humility becomes superiority.</li>
+          <li>Honesty without patience becomes harshness.</li>
+          <li>Patience without truth becomes avoidance.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MASTER QUESTIONS -->
+<div class="section-panel" id="panel-master">
+  <h2 class="section-title">20 Master Questions</h2>
+  <p class="section-sub">Final "Bible for Everyday Life" master questions. Use these repeatedly.</p>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px">
+    <div style="padding:20px;border:2px solid var(--border);border-radius:var(--radius);background:var(--surface)"><span style="font-size:24px">1</span><div style="font-family:'Fraunces',serif;font-size:18px;font-weight:700;margin-top:8px">What is God revealing?</div></div>
+    <div style="padding:20px;border:2px solid var(--border);border-radius:var(--radius);background:var(--surface)"><span style="font-size:24px">2</span><div style="font-family:'Fraunces',serif;font-size:18px;font-weight:700;margin-top:8px">What is God correcting?</div></div>
+    <div style="padding:20px;border:2px solid var(--border);border-radius:var(--radius);background:var(--surface)"><span style="font-size:24px">3</span><div style="font-family:'Fraunces',serif;font-size:18px;font-weight:700;margin-top:8px">What is God healing?</div></div>
+    <div style="padding:20px;border:2px solid var(--border);border-radius:var(--radius);background:var(--surface)"><span style="font-size:24px">4</span><div style="font-family:'Fraunces',serif;font-size:18px;font-weight:700;margin-top:8px">What is God inviting?</div></div>
+    <div style="padding:20px;border:2px solid var(--border);border-radius:var(--radius);background:var(--surface)"><span style="font-size:24px">5</span><div style="font-family:'Fraunces',serif;font-size:18px;font-weight:700;margin-top:8px">What am I avoiding?</div></div>
+    <div style="padding:20px;border:2px solid var(--border);border-radius:var(--radius);background:var(--surface)"><span style="font-size:24px">6</span><div style="font-family:'Fraunces',serif;font-size:18px;font-weight:700;margin-top:8px">What am I craving?</div></div>
+    <div style="padding:20px;border:2px solid var(--border);border-radius:var(--radius);background:var(--surface)"><span style="font-size:24px">7</span><div style="font-family:'Fraunces',serif;font-size:18px;font-weight:700;margin-top:8px">What am I fearing?</div></div>
+    <div style="padding:20px;border:2px solid var(--border);border-radius:var(--radius);background:var(--surface)"><span style="font-size:24px">8</span><div style="font-family:'Fraunces',serif;font-size:18px;font-weight:700;margin-top:8px">What am I trusting?</div></div>
+    <div style="padding:20px;border:2px solid var(--border);border-radius:var(--radius);background:var(--surface)"><span style="font-size:24px">9</span><div style="font-family:'Fraunces',serif;font-size:18px;font-weight:700;margin-top:8px">What am I excusing?</div></div>
+    <div style="padding:20px;border:2px solid var(--border);border-radius:var(--radius);background:var(--surface)"><span style="font-size:24px">10</span><div style="font-family:'Fraunces',serif;font-size:18px;font-weight:700;margin-top:8px">What am I learning?</div></div>
+    <div style="padding:20px;border:2px solid var(--border);border-radius:var(--radius);background:var(--surface)"><span style="font-size:24px">11</span><div style="font-family:'Fraunces',serif;font-size:18px;font-weight:700;margin-top:8px">What needs repentance?</div></div>
+    <div style="padding:20px;border:2px solid var(--border);border-radius:var(--radius);background:var(--surface)"><span style="font-size:24px">12</span><div style="font-family:'Fraunces',serif;font-size:18px;font-weight:700;margin-top:8px">What needs courage?</div></div>
+    <div style="padding:20px;border:2px solid var(--border);border-radius:var(--radius);background:var(--surface)"><span style="font-size:24px">13</span><div style="font-family:'Fraunces',serif;font-size:18px;font-weight:700;margin-top:8px">What needs patience?</div></div>
+    <div style="padding:20px;border:2px solid var(--border);border-radius:var(--radius);background:var(--surface)"><span style="font-size:24px">14</span><div style="font-family:'Fraunces',serif;font-size:18px;font-weight:700;margin-top:8px">What needs wisdom?</div></div>
+    <div style="padding:20px;border:2px solid var(--border);border-radius:var(--radius);background:var(--surface)"><span style="font-size:24px">15</span><div style="font-family:'Fraunces',serif;font-size:18px;font-weight:700;margin-top:8px">What needs love?</div></div>
+    <div style="padding:20px;border:2px solid var(--border);border-radius:var(--radius);background:var(--surface)"><span style="font-size:24px">16</span><div style="font-family:'Fraunces',serif;font-size:18px;font-weight:700;margin-top:8px">What needs boundaries?</div></div>
+    <div style="padding:20px;border:2px solid var(--border);border-radius:var(--radius);background:var(--surface)"><span style="font-size:24px">17</span><div style="font-family:'Fraunces',serif;font-size:18px;font-weight:700;margin-top:8px">What needs surrender?</div></div>
+    <div style="padding:20px;border:2px solid var(--border);border-radius:var(--radius);background:var(--surface)"><span style="font-size:24px">18</span><div style="font-family:'Fraunces',serif;font-size:18px;font-weight:700;margin-top:8px">What needs gratitude?</div></div>
+    <div style="padding:20px;border:2px solid var(--border);border-radius:var(--radius);background:var(--surface)"><span style="font-size:24px">19</span><div style="font-family:'Fraunces',serif;font-size:18px;font-weight:700;margin-top:8px">What needs repair?</div></div>
+    <div style="padding:20px;border:2px solid var(--border);border-radius:var(--radius);background:var(--surface);background:var(--accent3)"><span style="font-size:24px">20</span><div style="font-family:'Fraunces',serif;font-size:18px;font-weight:700;margin-top:8px">What is the next faithful step?</div></div>
+  </div>
+</div>
+
+</div><!-- /content-area -->
+
+<div style="padding:40px;border-top:2px solid var(--border);background:var(--surface2);font-size:13px;color:var(--ink2);line-height:1.7;position:relative;z-index:2">
+  <strong>Bottom Line:</strong> The Bible is not just a book for church settings. It is a whole-life formation guide that teaches us how to become honest before God, wise with ourselves, loving toward people, discerning in decisions, steady in suffering, humble in success, and faithful in ordinary life.
+  <div style="margin-top:20px;display:flex;gap:12px;flex-wrap:wrap">
+    <a href="hardlife.html" style="padding:12px 24px;background:var(--accent3);color:var(--ink);border-radius:100px;text-decoration:none;font-size:11px;letter-spacing:2px;text-transform:uppercase;font-family:'Space Mono',monospace">Next: Hard Life →</a>
+    <a href="cards.html" style="padding:12px 24px;border:2px solid var(--border);border-radius:100px;text-decoration:none;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--ink);font-family:'Space Mono',monospace">Draw a Card</a>
+  </div>
+</div>
+
+<script>
+const cursor=document.getElementById('cursor'),dot=document.getElementById('cursorDot');
+let mx=0,my=0,cx=0,cy=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;dot.style.left=mx+'px';dot.style.top=my+'px'});
+(function anim(){cx+=(mx-cx)*0.15;cy+=(my-cy)*0.15;cursor.style.left=cx+'px';cursor.style.top=cy+'px';requestAnimationFrame(anim)})();
+document.querySelectorAll('a,button').forEach(el=>{el.addEventListener('mouseenter',()=>cursor.classList.add('hover'));el.addEventListener('mouseleave',()=>cursor.classList.remove('hover'))});
+const dm=document.getElementById('dmToggle');
+document.documentElement.setAttribute('data-theme',localStorage.getItem('sq-theme')||'light');
+dm.onclick=()=>{const t=document.documentElement.getAttribute('data-theme')==='light'?'dark':'light';document.documentElement.setAttribute('data-theme',t);localStorage.setItem('sq-theme',t)};
+// NAV BURGER
+const burger=document.getElementById('navBurger'),mobileNav=document.getElementById('navMobile');if(burger&&mobileNav){burger.addEventListener('click',()=>{const o=mobileNav.classList.toggle('open');burger.classList.toggle('open');burger.setAttribute('aria-expanded',o)});mobileNav.querySelectorAll('.nav-link').forEach(l=>l.addEventListener('click',()=>{mobileNav.classList.remove('open');burger.classList.remove('open');burger.setAttribute('aria-expanded',false)}))}
+
+// QUESTION DATA
+const sectionQuestions={
+  identity:["Who are you when nobody is impressed?","What identity do you keep trying to earn?","What title, role, or achievement would scare you to lose?","What do you believe makes you valuable?","Where do you feel most replaceable?","What lie about yourself have you repeated for years?","What part of you do you hide because you think it is too much?","What part of you do you hide because you think it is not enough?","How would your life change if you truly believed you were loved by God?","What version of yourself are you trying to prove to others?","When do you feel most like the person God created you to be?","What do you need to stop calling 'my personality' when it is actually fear, pride, or self-protection?","What does God say about you that you still struggle to receive?","Are you living from belovedness or for validation?","Who are you becoming through your daily habits?"],
+  emotions:["What emotion have you been avoiding?","What feeling do you judge yourself for having?","When you are anxious, what are you really afraid of losing?","What sadness have you not allowed yourself to grieve?","What anger might be pointing to something important?","What do you do when you feel disappointed with God?","What emotion makes you feel spiritually weak?","What do you usually do instead of praying honestly?","Are you more comfortable being numb than being honest?","What would you say to God if you knew He would not reject you?","What emotion keeps coming back because you keep ignoring it?","Where do you need comfort, not just correction?","What is your soul tired of pretending?","What are you carrying that was never yours to carry?","What would lament sound like for you right now?"],
+  relationships:["Who gets the most honest version of you?","Who gets the most guarded version of you?","What kind of people are easiest for you to love?","What kind of people are hardest for you to love?","When do you confuse niceness with love?","When do you confuse honesty with harshness?","What relationship reveals your immaturity most clearly?","Do people feel safer, smaller, freer, or more anxious around you?","What do you demand from others that you rarely give?","Where have you been keeping score?","Who do you need to forgive, even if trust is not restored yet?","Who have you hurt but not properly apologized to?","Are your relationships built on love, usefulness, image, or convenience?","What would it mean to honor someone without enabling them?","What pattern follows you from relationship to relationship?"],
+  friendship:["Who helps you become more like Christ?","Who makes sin feel normal to you?","Who can lovingly correct you?","Who knows the real state of your soul?","Who do you laugh with but cannot be honest with?","Who do you admire but secretly compare yourself to?","Who brings out your courage?","Who brings out your insecurity?","Do your friendships have depth or only entertainment?","Are you a safe friend?","Do you only reach out when you need something?","Who have you neglected because life got busy?","What kind of friend do you pray to become?","What friendship needs a clearer boundary?","What friendship needs more intentional investment?"],
+  dating:["Are you looking for love, validation, rescue, status, or covenant?","What kind of person are you becoming while waiting?","What red flags do you tend to excuse when you like someone?","What green flags do you undervalue because they are not dramatic?","Are you attracted to character or chemistry only?","Do you want someone godly, or someone who fits your fantasy?","What wounds shape your romantic choices?","What does emotional safety look like to you?","What does spiritual maturity look like in a partner?","Do you confuse peace with boredom?","Do you confuse intensity with love?","What would your closest friends warn your future spouse about?","What kind of conflict pattern do you bring into relationships?","Can you be honest without manipulating?","Would this relationship help both of you obey God more deeply?"],
+  family:["What did your family teach you about love?","What did your family teach you about conflict?","What did your family teach you about money?","What did your family teach you about emotions?","What did your family teach you about God?","What family pattern do you want to continue?","What family pattern must stop with you?","Where do you confuse honoring your parents with obeying every expectation?","What do you still wish your family understood about you?","What role did you play in your family system?","Were you the responsible one, invisible one, rebellious one, funny one, helper, achiever, or peacekeeper?","What are you still trying to prove to your family?","What would forgiveness look like without pretending nothing happened?","What boundary would help you love your family more honestly?","How has God fathered or mothered you where human family fell short?"],
+  work:["Are you working from calling, fear, ego, survival, or comparison?","What does success mean to you?","Who taught you that definition of success?","What are you sacrificing to achieve your goals?","Are you becoming more loving as you become more successful?","What work makes you feel alive?","What work drains your soul?","What gift has God given you that you keep minimizing?","Where are you hiding behind 'humility' because you fear responsibility?","Where are you chasing ambition because you fear insignificance?","What would faithfulness look like in your current job?","What workplace injustice bothers you most?","Are you diligent when nobody praises you?","What would you do differently if your work was worship?","Is your ambition submitted to God or using God for approval?"],
+  money:["What does money represent to you: security, freedom, status, control, comfort, or power?","What financial fear shapes your decisions?","Are you generous when nobody knows?","What purchase are you hoping will fix your insecurity?","What lifestyle are you chasing and why?","Do you compare your life to people you do not even know?","What does contentment look like practically?","Are you building wealth or building identity through wealth?","What would your bank statement reveal about your worship?","Do you use money to avoid dependence on God?","Do you judge rich people, poor people, or yourself unfairly?","Where do you need financial discipline?","Where do you need financial faith?","What does enough mean to you?","If God asked you to give more, what fear would surface first?"],
+  conflict:["Do you avoid conflict, escalate conflict, or manipulate conflict?","What do you usually do when someone disappoints you?","What is your apology style?","Do you apologize to repair, or to end discomfort?","When did you last say, 'I was wrong,' without defending yourself?","Do you listen to understand or to prepare your defense?","What truth do you need to speak gently?","What resentment have you been rehearsing?","What boundary do you need to name clearly?","What relationship needs repair but not necessarily closeness?","Do you use silence as punishment?","Do you use honesty as a weapon?","Are you more committed to being right or being reconciled?","What would humility look like in your current conflict?","What would love do if it was also wise?"],
+  wisdom:["What decision are you avoiding?","What option are you secretly hoping God approves?","Are you seeking wisdom or confirmation?","What would you choose if fear was not controlling you?","What would you choose if ego was not controlling you?","What advice would you give a friend in your situation?","Who has permission to challenge your thinking?","What are the likely fruits of this decision in five years?","What desire is loudest right now?","What does Scripture clearly say?","What is morally clear, and what is wisdom-based?","What are you calling 'peace' that may actually be avoidance?","What are you calling 'faith' that may actually be impulsiveness?","What are you calling 'discernment' that may actually be fear?","What next faithful step can you take without knowing everything?"],
+  suffering:["What disappointment changed you?","What prayer feels unanswered?","Where are you tired of waiting?","What has suffering revealed about your faith?","What has suffering revealed about your support system?","What do you wish Christians said less often to hurting people?","What comfort has actually helped you?","What part of God's character is hardest to believe right now?","What are you grieving that others may not recognize?","Where do you feel left behind?","What has pain made you more compassionate toward?","What has pain made you more cynical about?","What would honest lament sound like today?","What hope still remains?","What does faithfulness look like when nothing changes yet?"],
+  spiritual:["What spiritual habit gives you life?","What spiritual habit feels performative?","Do you pray more honestly or more politely?","What keeps you from reading Scripture deeply?","Are you disciplined or merely intense in short bursts?","What would a sustainable spiritual rhythm look like?","Do you use busyness as an excuse to avoid God?","Do you use ministry as an excuse to avoid God?","When do you feel closest to God?","When do you feel most resistant to God?","What would silence reveal that noise helps you avoid?","Is your faith mostly private, public, emotional, intellectual, or embodied?","What spiritual practice do you need in this season?","What practice do you need to simplify?","Are you trying to earn love from God or remain rooted in it?"],
+  church:["What has church meant to you in different seasons?","Where has church helped you heal?","Where has church hurt or disappointed you?","Do you attend church as consumer, critic, servant, family, or disciple?","What do you expect from church that may be unrealistic?","What do you tolerate in church that should be addressed?","Are you looking for perfect community or faithful community?","Do you confuse excellence with anointing?","Do you confuse simplicity with lack of depth?","Do you confuse emotional worship with spiritual maturity?","Do you confuse theological knowledge with Christlikeness?","What kind of church culture helps people grow?","What kind of church culture produces performance?","What would it mean to serve without becoming resentful?","How can you be part of building the community you wish existed?"],
+  character:["Who are you when nobody can reward you?","What sin do you excuse because it is socially acceptable?","What virtue do you admire but rarely practice?","What do you do with jealousy?","What do you do with lust?","What do you do with pride?","What do you do with laziness?","What do you do with bitterness?","What do you do with attention?","What do you do with power?","What would your private habits reveal about your heart?","What fruit is growing in your life?","What fruit is missing?","Where do you need confession, not just self-improvement?","What part of your character would shock people if exposed?"],
+};
+
+function buildCarousel(sectionKey,trackId,prevId,nextId,countId){
+  const qs=sectionQuestions[sectionKey];if(!qs)return;
+  const track=document.getElementById(trackId);if(!track)return;
+  qs.forEach((q,i)=>{
+    const el=document.createElement('div');
+    el.className='q-card';
+    el.innerHTML=`<div class="q-card-inner"><div class="q-num">Question ${i+1} of ${qs.length}</div><div class="q-text">"${q}"</div></div><div class="q-footer"><span class="q-tag">#${sectionKey}</span><button class="q-btn" onclick="playBing()">Journal It ✦</button></div>`;
+    track.appendChild(el);
+  });
+  const prev=document.getElementById(prevId),next=document.getElementById(nextId),count=document.getElementById(countId);
+  let idx=0;const total=qs.length;
+  function go(n){idx=(n+total)%total;track.style.transform=`translateX(-${idx*100}%)`;if(count)count.textContent=`${idx+1} / ${total}`;}
+  if(prev)prev.onclick=()=>{go(idx-1);playClick()};
+  if(next)next.onclick=()=>{go(idx+1);playClick()};
+}
+
+// Section carousel
+(function(){const track=document.getElementById('section-track'),prev=document.getElementById('theme-prev'),next=document.getElementById('theme-next'),count=document.getElementById('theme-count'),label=document.getElementById('theme-label');if(!track||!prev||!next)return;const btns=Array.from(track.querySelectorAll('.section-btn'));const total=btns.length;let idx=0;function activate(btn){btns.forEach(b=>b.classList.remove('active'));btn.classList.add('active');document.querySelectorAll('.section-panel').forEach(p=>p.classList.remove('visible'));const panel=document.getElementById('panel-'+btn.dataset.section);if(panel)panel.classList.add('visible');}function go(n){idx=(n+total)%total;track.style.transform=`translateX(-${idx*100}%)`;if(count)count.textContent=`${idx+1} / ${total}`;if(label)label.textContent=idx+1;activate(btns[idx]);playClick();}btns.forEach((btn,i)=>{btn.addEventListener('click',()=>{if(idx!==i)go(i);else{activate(btn);playClick();}})});prev.onclick=()=>go(idx-1);next.onclick=()=>go(idx+1);let sx=0;track.parentElement.addEventListener('touchstart',e=>{sx=e.touches[0].clientX},{passive:true});track.parentElement.addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>40){dx<0?go(idx+1):go(idx-1)}},{passive:true});})();
+
+// Build all carousels
+buildCarousel('identity','id-track','id-prev','id-next','id-count');
+buildCarousel('emotions','em-track','em-prev','em-next','em-count');
+buildCarousel('relationships','rel-track','rel-prev','rel-next','rel-count');
+buildCarousel('friendship','fr-track','fr-prev','fr-next','fr-count');
+buildCarousel('dating','dt-track','dt-prev','dt-next','dt-count');
+buildCarousel('family','fam-track','fam-prev','fam-next','fam-count');
+buildCarousel('work','wk-track','wk-prev','wk-next','wk-count');
+buildCarousel('money','mn-track','mn-prev','mn-next','mn-count');
+buildCarousel('conflict','cf-track','cf-prev','cf-next','cf-count');
+buildCarousel('wisdom','ws-track','ws-prev','ws-next','ws-count');
+buildCarousel('suffering','sf-track','sf-prev','sf-next','sf-count');
+buildCarousel('spiritual','sd-track','sd-prev','sd-next','sd-count');
+buildCarousel('church','ch-track','ch-prev','ch-next','ch-count');
+buildCarousel('character','ch2-track','ch2-prev','ch2-next','ch2-count');
+
+var audioCtx;
+function playClick(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.connect(g);g.connect(audioCtx.destination);o.frequency.setValueAtTime(500,audioCtx.currentTime);o.frequency.exponentialRampToValueAtTime(200,audioCtx.currentTime+0.07);g.gain.setValueAtTime(0.06,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.07);o.start();o.stop(audioCtx.currentTime+0.07)}
+function playBing(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.connect(g);g.connect(audioCtx.destination);o.type='sine';o.frequency.setValueAtTime(660,audioCtx.currentTime);o.frequency.exponentialRampToValueAtTime(990,audioCtx.currentTime+0.15);g.gain.setValueAtTime(0.07,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.4);o.start();o.stop(audioCtx.currentTime+0.4)}
+</script>
+</body>
+</html>

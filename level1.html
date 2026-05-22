@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 01 — The Bible Playbook | SOULQUEST</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Space+Mono:wght@400;700&family=Fraunces:ital,wght@0,100;0,900;1,700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f5f0e8;--surface:#ffffff;--surface2:#fff8ee;
+    --ink:#1a1207;--ink2:#4a3f2f;
+    --accent1:#ff4d1c;--accent2:#ffd600;--accent3:#00c896;--accent4:#7c3aed;--accent5:#ff6b9d;
+    --border:#1a1207;--radius:20px;--transition:cubic-bezier(0.34,1.56,0.64,1);
+    --card-h:480px;
+  }
+  [data-theme="dark"]{
+    --bg:#0e0c09;--surface:#1c1812;--surface2:#251f14;
+    --ink:#f5f0e8;--ink2:#c8b89a;
+    --accent1:#ff6040;--accent2:#ffe040;--accent3:#00e8a8;--accent4:#a855f7;--accent5:#ff80b0;
+    --border:#f5f0e8;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Space Mono',monospace;background:var(--bg);color:var(--ink);overflow-x:hidden;transition:background .4s,color .4s}
+  body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:1;opacity:0.5}
+  .cursor{position:fixed;width:20px;height:20px;border:2px solid var(--accent1);border-radius:50%;pointer-events:none;z-index:99999;transform:translate(-50%,-50%);transition:width .15s,height .15s;mix-blend-mode:multiply}
+  [data-theme="dark"] .cursor{mix-blend-mode:screen}
+  .cursor-dot{position:fixed;width:6px;height:6px;background:var(--accent1);border-radius:50%;pointer-events:none;z-index:99999;transform:translate(-50%,-50%)}
+  .cursor.hover{width:44px;height:44px;border-color:var(--accent2)}
+  .dm-toggle{width:44px;height:24px;background:var(--ink);border-radius:12px;cursor:pointer;border:none;display:flex;align-items:center;padding:3px;transition:background .3s;flex-shrink:0}
+  .dm-toggle::after{content:'';width:18px;height:18px;background:var(--bg);border-radius:50%;transition:transform .3s var(--transition)}
+  [data-theme="dark"] .dm-toggle::after{transform:translateX(20px)}
+  /* NAV */
+  nav{position:sticky;top:0;z-index:100;padding:0 clamp(16px,4vw,40px);border-bottom:2px solid var(--border);background:var(--bg);display:flex;align-items:center;justify-content:space-between;min-height:60px;gap:16px;transition:background .4s}
+  .nav-logo{font-family:'Fraunces',serif;font-weight:900;font-size:clamp(16px,4vw,22px);text-decoration:none;color:var(--ink);flex-shrink:0}
+  .nav-right{display:flex;align-items:center;gap:12px}
+  .nav-links{display:flex;gap:clamp(10px,2vw,20px);align-items:center}
+  .nav-link{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--ink2);text-decoration:none;transition:color .2s;white-space:nowrap}
+  .nav-link:hover,.nav-link.active{color:var(--accent1)}
+  .nav-burger{display:none;flex-direction:column;justify-content:center;gap:5px;width:36px;height:36px;cursor:pointer;background:transparent;border:none;padding:7px;flex-shrink:0}
+  .nav-burger span{display:block;width:100%;height:2px;background:var(--ink);border-radius:2px;transition:transform .3s,opacity .3s}
+  .nav-burger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+  .nav-burger.open span:nth-child(2){opacity:0}
+  .nav-burger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+  .nav-mobile{display:none;position:absolute;top:100%;left:0;right:0;background:var(--bg);border-bottom:2px solid var(--border);padding:8px clamp(16px,4vw,40px) 16px;flex-direction:column;z-index:99;transition:background .4s}
+  .nav-mobile.open{display:flex}
+  .nav-mobile .nav-link{font-size:12px;letter-spacing:2px;padding:14px 0;border-bottom:1px solid var(--border);white-space:normal}
+  .nav-mobile .nav-link:last-child{border-bottom:none}
+  @media(max-width:680px){.nav-links{display:none}.nav-burger{display:flex}}
+  /* PAGE HERO */
+  .page-hero{
+    padding:60px 40px 40px;
+    background:linear-gradient(135deg,var(--accent2)22,var(--accent3)11,transparent 60%);
+    border-bottom:2px solid var(--border);
+    position:relative;z-index:2;
+  }
+  .page-badge{font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--accent1);margin-bottom:12px;display:block}
+  .page-title{font-family:'Fraunces',serif;font-weight:900;font-size:clamp(40px,8vw,90px);line-height:0.9;margin-bottom:20px}
+  .page-sub{font-size:13px;color:var(--ink2);max-width:600px;line-height:1.7}
+  /* LEVEL TABS */
+  .level-tabs{
+    display:flex;gap:0;border-bottom:2px solid var(--border);
+    position:sticky;top:65px;z-index:90;
+    background:var(--bg);overflow-x:auto;
+    transition:background .4s;
+  }
+  .level-tab{
+    padding:16px 32px;font-family:'Space Mono',monospace;
+    font-size:11px;letter-spacing:2px;text-transform:uppercase;
+    border:none;background:transparent;color:var(--ink2);
+    cursor:pointer;border-right:2px solid var(--border);
+    border-bottom:4px solid transparent;
+    white-space:nowrap;transition:all .2s;
+  }
+  .level-tab.active{color:var(--ink);border-bottom-color:var(--accent1);background:var(--surface2)}
+  /* CAROUSEL */
+  .carousel-section{
+    padding:48px 40px;border-bottom:2px solid var(--border);
+    position:relative;z-index:2;
+  }
+  .carousel-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+  .carousel-title{font-family:'Fraunces',serif;font-weight:900;font-size:28px}
+  .carousel-nav{display:flex;gap:8px;align-items:center}
+  .carousel-btn{
+    width:40px;height:40px;border-radius:50%;border:2px solid var(--border);
+    background:var(--surface);color:var(--ink);
+    cursor:pointer;font-size:16px;
+    display:flex;align-items:center;justify-content:center;
+    transition:all .2s var(--transition);
+  }
+  .carousel-btn:hover{background:var(--ink);color:var(--bg);transform:scale(1.1)}
+  .carousel-counter{font-size:11px;letter-spacing:2px;color:var(--ink2);padding:0 8px}
+  .carousel-track-wrap{overflow:hidden;border-radius:var(--radius);border:2px solid var(--border)}
+  .carousel-track{
+    display:flex;transition:transform .5s cubic-bezier(0.25,0.46,0.45,0.94);
+    will-change:transform;
+  }
+  /* CARD STYLES */
+  .card{
+    min-width:100%;height:var(--card-h);
+    background:var(--surface);padding:40px;
+    display:flex;flex-direction:column;
+    justify-content:space-between;
+    overflow:hidden;position:relative;
+  }
+  .card-inner{overflow-y:auto;flex:1;padding-right:8px;margin-bottom:16px}
+  .card-inner::-webkit-scrollbar{width:3px}
+  .card-inner::-webkit-scrollbar-thumb{background:var(--accent1);border-radius:3px}
+  .card-level{
+    display:inline-block;padding:4px 12px;border-radius:100px;
+    font-size:10px;letter-spacing:3px;text-transform:uppercase;font-weight:700;
+    margin-bottom:16px;
+  }
+  .card-level.l1{background:var(--accent2);color:var(--ink)}
+  .card-level.l2{background:var(--accent1);color:#fff}
+  .card-level.l3{background:var(--accent4);color:#fff}
+  .card-level.lw{background:var(--accent3);color:var(--ink)}
+  .card-num{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--ink2);margin-bottom:8px}
+  .card-question{
+    font-family:'Fraunces',serif;font-style:italic;
+    font-size:clamp(18px,3vw,28px);font-weight:700;
+    line-height:1.3;color:var(--ink);margin-bottom:24px;
+  }
+  .card-verse{
+    border-left:4px solid var(--accent1);
+    padding:12px 16px;margin-bottom:16px;
+    font-family:'Fraunces',serif;font-style:italic;
+    font-size:14px;line-height:1.6;color:var(--ink);
+    background:var(--surface2);border-radius:0 8px 8px 0;
+  }
+  .card-verse-ref{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--ink2);margin-top:6px;font-style:normal}
+  .card-insight{font-size:13px;line-height:1.8;color:var(--ink2);margin-bottom:16px}
+  .card-practice{
+    padding:16px 20px;background:var(--surface2);
+    border-radius:12px;border:1px solid var(--border);
+    font-size:13px;line-height:1.7;
+  }
+  .card-practice-label{
+    font-size:10px;letter-spacing:3px;text-transform:uppercase;
+    color:var(--accent1);font-weight:700;margin-bottom:6px;display:block;
+  }
+  .card-footer{
+    display:flex;align-items:center;justify-content:space-between;
+    padding-top:16px;border-top:1px solid var(--border);flex-shrink:0;
+  }
+  .card-tag{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--ink2)}
+  .card-flip-btn{
+    padding:8px 20px;border-radius:100px;border:2px solid var(--border);
+    background:transparent;color:var(--ink);font-family:'Space Mono',monospace;
+    font-size:11px;letter-spacing:2px;cursor:pointer;
+    transition:all .2s var(--transition);
+  }
+  .card-flip-btn:hover{background:var(--accent1);color:#fff;border-color:var(--accent1)}
+  /* WILDCARD TABLE */
+  .wild-table{width:100%;border-collapse:collapse;font-size:13px}
+  .wild-table th{text-align:left;padding:12px 16px;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--ink2);border-bottom:2px solid var(--border)}
+  .wild-table td{padding:14px 16px;border-bottom:1px solid var(--border);vertical-align:top;line-height:1.6}
+  .wild-table td:first-child{font-weight:700;color:var(--accent1);white-space:nowrap;width:180px}
+  .wild-table tr:hover td{background:var(--surface2)}
+  /* REFLECTION BOX */
+  .reflection{
+    padding:32px;border:2px solid var(--border);border-radius:var(--radius);
+    background:var(--surface);box-shadow:6px 6px 0 var(--border);
+    font-size:13px;line-height:1.8;color:var(--ink2);
+    font-style:italic;
+  }
+  /* HOW TO USE */
+  .how-section{padding:48px 40px;border-bottom:2px solid var(--border);position:relative;z-index:2}
+  .how-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;margin-top:28px}
+  .how-card{padding:24px;border:2px solid var(--border);border-radius:var(--radius);background:var(--surface)}
+  .how-icon{font-size:28px;margin-bottom:12px}
+  .how-label{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--ink2);margin-bottom:6px}
+  .how-text{font-size:13px;line-height:1.6;color:var(--ink2)}
+</style>
+</head>
+<body>
+<div class="cursor" id="cursor"></div>
+<div class="cursor-dot" id="cursorDot"></div>
+<nav>
+  <a href="index.html" class="nav-logo">SOULQUEST</a>
+  <div class="nav-right">
+    <div class="nav-links">
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="level1.html" class="nav-link active">Module 01</a>
+      <a href="audit.html" class="nav-link">Module 02</a>
+      <a href="playbook.html" class="nav-link">Module 03</a>
+      <a href="hardlife.html" class="nav-link">Module 04</a>
+      <a href="cards.html" class="nav-link">Module 05</a>
+    </div>
+    <button class="dm-toggle" id="dmToggle" aria-label="Toggle dark mode"></button>
+    <button class="nav-burger" id="navBurger" aria-label="Toggle menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <div class="nav-mobile" id="navMobile">
+    <a href="index.html" class="nav-link">Home</a>
+    <a href="level1.html" class="nav-link active">Module 01</a>
+    <a href="audit.html" class="nav-link">Module 02</a>
+    <a href="playbook.html" class="nav-link">Module 03</a>
+    <a href="hardlife.html" class="nav-link">Module 04</a>
+    <a href="cards.html" class="nav-link">Module 05</a>
+  </div>
+</nav>
+
+<div class="page-hero">
+  <span class="page-badge">✦ Module 01 · The Bible Playbook ✦</span>
+  <h1 class="page-title">THE<br>PLAYBOOK</h1>
+  <p class="page-sub">A "We're Not Really Strangers" structure rooted in Scripture. Each section gives you the Question, the Verse, the Insight, and the Practice. Don't skip to Level 3. Trust the process.</p>
+</div>
+
+<div class="level-tabs" id="levelTabs">
+  <button class="level-tab active" data-level="why">🧭 Why This Exists</button>
+  <button class="level-tab" data-level="l1">🟡 Level 1: Perception</button>
+  <button class="level-tab" data-level="l2">🟠 Level 2: Connection</button>
+  <button class="level-tab" data-level="l3">🔴 Level 3: Reflection</button>
+  <button class="level-tab" data-level="wild">🃏 Wildcard Deck</button>
+</div>
+
+<!-- WHY THIS EXISTS -->
+<div id="panel-why">
+  <div class="how-section">
+    <span style="font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--ink2)">✦ The Foundation ✦</span>
+    <h2 style="font-family:'Fraunces',serif;font-weight:900;font-size:clamp(28px,5vw,52px);margin-top:12px;margin-bottom:20px">Why This Exists</h2>
+    <div style="max-width:800px;font-size:14px;line-height:1.9;color:var(--ink2)">
+      <p style="margin-bottom:16px">When Brené Brown asked people about love, they told her about heartbreak. When she asked about belonging, they described the most excruciating moments of being excluded. When she asked about connection, they told her stories of disconnection.</p>
+      <p style="margin-bottom:16px">The Bible has been doing this work for 3,000+ years — meeting people in <strong>exactly</strong> those raw spaces.</p>
+      <p style="margin-bottom:16px">The "We're Not Really Strangers" (WNRS) game, created by Koreen Odiney, uses three progressive levels — <strong>Perception, Connection, and Reflection</strong> — built on principles of emotional intelligence and social psychology to help people make authentic, genuine connections.</p>
+      <p>This playbook is the same architecture — but rooted in Scripture. Each section gives you the Question (like a WNRS card), the Verse (the anchor), the Insight (what it actually means for your real life), and the Practice (one tangible action).</p>
+    </div>
+    <div style="margin-top:32px;padding:24px 32px;border:2px solid var(--border);border-radius:var(--radius);background:var(--surface);max-width:700px;box-shadow:4px 4px 0 var(--border)">
+      <blockquote style="font-family:'Fraunces',serif;font-style:italic;font-size:20px;line-height:1.5;color:var(--ink)">
+        "The things that make us feel most alone are really what connect us most passionately — and that's our fear of not being enough."
+      </blockquote>
+      <p style="margin-top:12px;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--ink2)">— Dr. Brené Brown, University of Houston researcher, after 20+ years studying human connection</p>
+    </div>
+  </div>
+
+  <div class="how-section">
+    <h2 style="font-family:'Fraunces',serif;font-weight:900;font-size:32px;margin-bottom:8px">⚙️ How to Use This</h2>
+    <p style="font-size:13px;color:var(--ink2);margin-bottom:24px;max-width:700px">The WNRS structure works because the first level warms you up, the second level moves beyond small talk into memories, emotions, and personal values, and the third level is about vulnerability and honesty — creating space for genuine emotional connection. By the end, players often feel closer and more emotionally open.</p>
+    <p style="font-size:13px;color:var(--ink2);margin-bottom:32px;max-width:700px">This playbook follows the same arc. <strong>Don't skip to Level 3.</strong> Trust the process. Use it:</p>
+    <div class="how-grid">
+      <div class="how-card"><div class="how-icon">📔</div><div class="how-label">Solo</div><div class="how-text">Journaling or devotional practice</div></div>
+      <div class="how-card"><div class="how-icon">👥</div><div class="how-label">With a friend or partner</div><div class="how-text">Take turns answering each card</div></div>
+      <div class="how-card"><div class="how-icon">⛪</div><div class="how-label">Small group or Bible study</div><div class="how-text">Guided discussion format</div></div>
+      <div class="how-card"><div class="how-icon">📅</div><div class="how-label">As daily cards</div><div class="how-text">One card, one day — slow formation</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- LEVEL 1: PERCEPTION -->
+<div id="panel-l1" style="display:none">
+  <div class="carousel-section">
+    <div style="padding:20px 0;margin-bottom:24px;border-bottom:2px solid var(--border)">
+      <span style="font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--accent2)">🟡 Level 1: Perception</span>
+      <h2 style="font-family:'Fraunces',serif;font-weight:900;font-size:clamp(24px,4vw,40px);margin-top:8px">Who do I think I am?<br>Who do others think I am?<br>What does God say?</h2>
+    </div>
+    <div class="carousel-header">
+      <div class="carousel-title">Cards 1–4</div>
+      <div class="carousel-nav">
+        <button class="carousel-btn" id="l1prev">←</button>
+        <span class="carousel-counter" id="l1count">1 / 4</span>
+        <button class="carousel-btn" id="l1next">→</button>
+      </div>
+    </div>
+    <div class="carousel-track-wrap">
+      <div class="carousel-track" id="l1track">
+
+        <!-- CARD 1 -->
+        <div class="card">
+          <div class="card-inner">
+            <span class="card-level l1">🟡 Level 1 · Perception</span>
+            <div class="card-num">🃏 Card 1 — Your Identity Isn't Your Resume</div>
+            <div class="card-question">"What word do you most often use to define yourself — and does it serve you?"</div>
+            <div class="card-verse">
+              "The Lord does not look at the things people look at. People look at the outward appearance, but the Lord looks at the heart."
+              <div class="card-verse-ref">— 1 Samuel 16:7 (NIV)</div>
+            </div>
+            <div class="card-insight">We live in a world where a generation of people is more "seen" than any previous generation and lonelier than most. In a moment of increasing automation, many feel replaceable — not just professionally, but existentially. The biblical answer is the same: your worth was never located in your productivity or your visibility.<br><br>This verse brings profound relief. It dismantles the deep anxiety we carry about being measured and found wanting by the external world — our success, our looks, our social standing.</div>
+            <div class="card-practice">
+              <span class="card-practice-label">🔑 The Practice</span>
+              Write down 3 labels you give yourself (job title, role, trait). Then ask: <em>Which of these would God cross out?</em> Replace each one with what 1 Samuel 16:7 implies God actually sees.
+            </div>
+          </div>
+          <div class="card-footer"><span class="card-tag">#Identity #Perception</span><button class="card-flip-btn">Reflect ✦</button></div>
+        </div>
+
+        <!-- CARD 2 -->
+        <div class="card">
+          <div class="card-inner">
+            <span class="card-level l1">🟡 Level 1 · Perception</span>
+            <div class="card-num">🃏 Card 2 — You Are Not a Mistake</div>
+            <div class="card-question">"When did you last feel like you were 'too much' or 'not enough'?"</div>
+            <div class="card-verse">
+              "I praise you because I am fearfully and wonderfully made; your works are wonderful, I know that full well."
+              <div class="card-verse-ref">— Psalm 139:14 (NIV)</div>
+            </div>
+            <div class="card-insight">This verse is a powerful rebuttal to the inner critic that whispers you are a mistake. To be "fearfully made" speaks of the reverence and awe of the creative process. To be "wonderfully made" points to the intricate, unique, and deliberate design of your being.<br><br>Embracing this truth is an act of worship — a way of agreeing with God's joyful assessment of you. It heals the shame of feeling flawed or inadequate.</div>
+            <div class="card-practice">
+              <span class="card-practice-label">🔑 The Practice</span>
+              Say the verse aloud, replacing "I am" with your name: <em>"[Name] is fearfully and wonderfully made."</em> Notice your resistance. That resistance is the work.
+            </div>
+          </div>
+          <div class="card-footer"><span class="card-tag">#Identity #Worth</span><button class="card-flip-btn">Reflect ✦</button></div>
+        </div>
+
+        <!-- CARD 3 -->
+        <div class="card">
+          <div class="card-inner">
+            <span class="card-level l1">🟡 Level 1 · Perception</span>
+            <div class="card-num">🃏 Card 3 — The Comparison Trap</div>
+            <div class="card-question">"Whose life do you scroll through and feel worse about your own?"</div>
+            <div class="card-verse">
+              "Each one should test their own actions. Then they can take pride in themselves alone, without comparing themselves to someone else."
+              <div class="card-verse-ref">— Galatians 6:4 (NIV)</div>
+            </div>
+            <div class="card-insight">Brown's research found that the fear of not being enough is what makes us feel most alone — and paradoxically, it's also what connects us most passionately. It's the universal wound we're all carrying in silence.<br><br>Comparison doesn't just steal joy. It steals <em>identity</em>. When we define ourselves by others' highlight reels, we are living someone else's story in our own skin.</div>
+            <div class="card-practice">
+              <span class="card-practice-label">🔑 The Practice</span>
+              For 24 hours, every time you feel the pull to compare, pivot to one question: <em>"What is God building in me right now that no one else can see yet?"</em>
+            </div>
+          </div>
+          <div class="card-footer"><span class="card-tag">#Comparison #SocialMedia</span><button class="card-flip-btn">Reflect ✦</button></div>
+        </div>
+
+        <!-- CARD 4 -->
+        <div class="card">
+          <div class="card-inner">
+            <span class="card-level l1">🟡 Level 1 · Perception</span>
+            <div class="card-num">🃏 Card 4 — Your Past Doesn't Own You</div>
+            <div class="card-question">"Is there something from your past you've let define your ceiling?"</div>
+            <div class="card-verse">
+              "Therefore, if anyone is in Christ, the new creation has come: The old has gone, the new is here!"
+              <div class="card-verse-ref">— 2 Corinthians 5:17 (NIV)</div>
+            </div>
+            <div class="card-insight">When you incorporate biblical principles into your daily routine, the teachings from Scripture change from just words written in a book to practical understanding that can notably affect your thinking, actions, and behavior toward others.<br><br>This verse is not sentimental — it's structural. The word "new creation" (<em>kainos ktisis</em> in Greek) means a <strong>qualitatively different order of existence</strong>. Not a cleaned-up version of the old you. An entirely new category.</div>
+            <div class="card-practice">
+              <span class="card-practice-label">🔑 The Practice</span>
+              Name one story you've been telling yourself that begins with <em>"I've always been..."</em> Write it down. Then write: <em>"The old has gone."</em> Burn it if you need to.
+            </div>
+          </div>
+          <div class="card-footer"><span class="card-tag">#Freedom #NewCreation</span><button class="card-flip-btn">Reflect ✦</button></div>
+        </div>
+
+      </div><!-- /track -->
+    </div><!-- /wrap -->
+  </div>
+</div><!-- /panel-l1 -->
+
+<!-- LEVEL 2: CONNECTION -->
+<div id="panel-l2" style="display:none">
+  <div class="carousel-section">
+    <div style="padding:20px 0;margin-bottom:24px;border-bottom:2px solid var(--border)">
+      <span style="font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--accent1)">🟠 Level 2: Connection</span>
+      <h2 style="font-family:'Fraunces',serif;font-weight:900;font-size:clamp(24px,4vw,40px);margin-top:8px">Who am I with you?<br>What do we owe each other?<br>Where do I need healing?</h2>
+    </div>
+    <div class="carousel-header">
+      <div class="carousel-title">Cards 5–10</div>
+      <div class="carousel-nav">
+        <button class="carousel-btn" id="l2prev">←</button>
+        <span class="carousel-counter" id="l2count">1 / 6</span>
+        <button class="carousel-btn" id="l2next">→</button>
+      </div>
+    </div>
+    <div class="carousel-track-wrap">
+      <div class="carousel-track" id="l2track">
+
+        <!-- CARD 5 -->
+        <div class="card">
+          <div class="card-inner">
+            <span class="card-level l2">🟠 Level 2 · Connection</span>
+            <div class="card-num">🃏 Card 5 — The Courage to Be Known</div>
+            <div class="card-question">"Is there a version of you that nobody in your life has seen?"</div>
+            <div class="card-verse">
+              "There is no fear in love. But perfect love drives out fear, because fear has to do with punishment. The one who fears is not made perfect in love."
+              <div class="card-verse-ref">— 1 John 4:18 (NIV)</div>
+            </div>
+            <div class="card-insight">Brown's research found that those who embrace vulnerability report greater feelings of worthiness and are more willing to engage authentically in relationships. Vulnerability isn't weakness — it opens pathways for love, belonging, joy, courage, empathy, and creativity.<br><br>The Bible reaches the same conclusion from the opposite direction: <strong>fear is the enemy of love.</strong> Not just romantic love — the deep love of being fully known and fully accepted. We hide because we fear judgment. But hiding prevents the very connection we're starving for.</div>
+            <div class="card-practice">
+              <span class="card-practice-label">🔑 The Practice</span>
+              Tell one person something true about yourself this week that you normally edit out. Start small. Truth-telling is a muscle.
+            </div>
+          </div>
+          <div class="card-footer"><span class="card-tag">#Vulnerability #Love</span><button class="card-flip-btn">Reflect ✦</button></div>
+        </div>
+
+        <!-- CARD 6 -->
+        <div class="card">
+          <div class="card-inner">
+            <span class="card-level l2">🟠 Level 2 · Connection</span>
+            <div class="card-num">🃏 Card 6 — Anxiety: The Lie You Believe About Tomorrow</div>
+            <div class="card-question">"What are you most anxious about right now — and what is that anxiety actually protecting?"</div>
+            <div class="card-verse">
+              "Do not be anxious about anything, but in every situation, by prayer and petition, with thanksgiving, present your requests to God."
+              <div class="card-verse-ref">— Philippians 4:6 (NIV)</div>
+            </div>
+            <div class="card-insight">Anxiety is often a sign of misplaced trust. We're trying to control outcomes that are beyond our control — a sign that we may be trusting in ourselves rather than in God. Anxiety also has a spiritual dimension — we may be neglecting our relationship with God, which is our greatest source of peace and security.<br><br>The biblical answer isn't "stop being anxious." It's "bring it to God." Prayer doesn't eliminate the unknown — it changes your relationship with it.</div>
+            <div class="card-practice">
+              <span class="card-practice-label">🔑 The Practice</span>
+              Write down your top anxiety. Then ask: <em>What am I trying to control here?</em> Then hand it — specifically — to God in prayer.
+            </div>
+          </div>
+          <div class="card-footer"><span class="card-tag">#Anxiety #Trust</span><button class="card-flip-btn">Reflect ✦</button></div>
+        </div>
+
+        <!-- CARD 7 -->
+        <div class="card">
+          <div class="card-inner">
+            <span class="card-level l2">🟠 Level 2 · Connection</span>
+            <div class="card-num">🃏 Card 7 — The Person You Haven't Forgiven</div>
+            <div class="card-question">"Who are you still carrying resentment toward — even if you say you've forgiven them?"</div>
+            <div class="card-verse">
+              "Bear with each other and forgive one another if any of you has a grievance against someone. Forgive as the Lord forgave you."
+              <div class="card-verse-ref">— Colossians 3:13 (NIV)</div>
+            </div>
+            <div class="card-insight">Forgiveness, reconciliation, and trust are related but not identical. <strong>Forgiveness</strong> releases vengeance. <strong>Reconciliation</strong> requires mutual willingness. <strong>Trust</strong> requires proven change over time.<br><br>The Bible calls Christians to forgive. It does not require foolishly trusting unrepentant or unsafe people. Forgiveness is not a feeling first — it's a decision of the will that feelings eventually follow.</div>
+            <div class="card-practice">
+              <span class="card-practice-label">🔑 The Practice</span>
+              Name the person. Say it out loud. Then ask: <em>Am I confusing forgiveness with forgetting? With trust? With reconciliation?</em> Those are separate things.
+            </div>
+          </div>
+          <div class="card-footer"><span class="card-tag">#Forgiveness #Healing</span><button class="card-flip-btn">Reflect ✦</button></div>
+        </div>
+
+        <!-- CARD 8 -->
+        <div class="card">
+          <div class="card-inner">
+            <span class="card-level l2">🟠 Level 2 · Connection</span>
+            <div class="card-num">🃏 Card 8 — The God You Actually Believe In</div>
+            <div class="card-question">"If you're honest — do you experience God as safe? Or as a scorekeeper?"</div>
+            <div class="card-verse">
+              "For I am convinced that neither death nor life, neither angels nor demons, neither the present nor the future, nor any powers, neither height nor depth, nor anything else in all creation, will be able to separate us from the love of God that is in Christ Jesus our Lord."
+              <div class="card-verse-ref">— Romans 8:38-39 (NIV)</div>
+            </div>
+            <div class="card-insight">Many people operate with a functional theology that is different from their stated theology. They say they believe in grace but live in constant fear of God's disappointment. The image of God we carry determines almost everything about how we relate to him — and to ourselves.<br><br>The Bible's answer to the God-as-scorekeeper view is this verse: nothing — not failure, not doubt, not sin, not trauma — can sever the connection.</div>
+            <div class="card-practice">
+              <span class="card-practice-label">🔑 The Practice</span>
+              Complete this sentence: <em>"My deepest, most honest image of God is that he is ____."</em> Then ask: <em>Is that the God of the Bible, or the god of my wounding?</em>
+            </div>
+          </div>
+          <div class="card-footer"><span class="card-tag">#God #Theology</span><button class="card-flip-btn">Reflect ✦</button></div>
+        </div>
+
+        <!-- CARD 9 -->
+        <div class="card">
+          <div class="card-inner">
+            <span class="card-level l2">🟠 Level 2 · Connection</span>
+            <div class="card-num">🃏 Card 9 — Loneliness: The Epidemic Nobody Prays About</div>
+            <div class="card-question">"When do you feel most alone — even when surrounded by people?"</div>
+            <div class="card-verse">
+              "Turn to me and be gracious to me, for I am lonely and afflicted."
+              <div class="card-verse-ref">— Psalm 25:16 (NIV)</div>
+            </div>
+            <div class="card-insight">The most radical thing Christians can do right now is face-to-face communication — preferably around a dinner table, around a meal. For all of the friends we have on Facebook, this is a lonely world. Loneliness is the loss of embodied relationships that cannot be replaced by friendships online.<br><br>David — the man after God's own heart — cried out to God in loneliness. This is modeled in Scripture, not hidden. Telling God you are lonely is not weakness — it is prayer.</div>
+            <div class="card-practice">
+              <span class="card-practice-label">🔑 The Practice</span>
+              Identify one person you could invite to a meal this week. Not a text. An actual meal. Loneliness requires embodied response.
+            </div>
+          </div>
+          <div class="card-footer"><span class="card-tag">#Loneliness #Community</span><button class="card-flip-btn">Reflect ✦</button></div>
+        </div>
+
+        <!-- CARD 10 -->
+        <div class="card">
+          <div class="card-inner">
+            <span class="card-level l2">🟠 Level 2 · Connection</span>
+            <div class="card-num">🃏 Card 10 — Grief: You Don't Have to Hurry Through It</div>
+            <div class="card-question">"What loss are you still not fully over — the one you pretend not to think about?"</div>
+            <div class="card-verse">
+              "He was despised and rejected by mankind, a man of suffering, and familiar with pain."
+              <div class="card-verse-ref">— Isaiah 53:3 (NIV)</div>
+            </div>
+            <div class="card-insight">Jesus did not hide from grief but let Himself sorrow for and with those He loved. He modeled compassion in the face of others' grief, and experienced it firsthand in his own life — grief isn't reserved for death alone.<br><br>The shortest verse in the Bible is <em>"Jesus wept"</em> (John 11:35). At a funeral. After being told the one who died would rise again. He wept anyway. Because grief is not the opposite of faith — it's the proof of love.</div>
+            <div class="card-practice">
+              <span class="card-practice-label">🔑 The Practice</span>
+              Name the loss. Say it out loud: <em>"I lost ______ and I haven't fully grieved it."</em> That naming — that's where healing starts.
+            </div>
+          </div>
+          <div class="card-footer"><span class="card-tag">#Grief #Loss</span><button class="card-flip-btn">Reflect ✦</button></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- LEVEL 3: REFLECTION -->
+<div id="panel-l3" style="display:none">
+  <div class="carousel-section">
+    <div style="padding:20px 0;margin-bottom:24px;border-bottom:2px solid var(--border)">
+      <span style="font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--accent4)">🔴 Level 3: Reflection</span>
+      <h2 style="font-family:'Fraunces',serif;font-weight:900;font-size:clamp(24px,4vw,40px);margin-top:8px">Who am I becoming?<br>What do I actually believe?<br>What's the truest thing about me?</h2>
+    </div>
+    <div class="carousel-header">
+      <div class="carousel-title">Cards 11–15</div>
+      <div class="carousel-nav">
+        <button class="carousel-btn" id="l3prev">←</button>
+        <span class="carousel-counter" id="l3count">1 / 5</span>
+        <button class="carousel-btn" id="l3next">→</button>
+      </div>
+    </div>
+    <div class="carousel-track-wrap">
+      <div class="carousel-track" id="l3track">
+
+        <div class="card">
+          <div class="card-inner">
+            <span class="card-level l3">🔴 Level 3 · Reflection</span>
+            <div class="card-num">🃏 Card 11 — Purpose: The Question Under Every Question</div>
+            <div class="card-question">"If fear and money weren't factors, what would you do with your life?"</div>
+            <div class="card-verse">
+              "For we are God's handiwork, created in Christ Jesus to do good works, which God prepared in advance for us to do."
+              <div class="card-verse-ref">— Ephesians 2:10 (NIV)</div>
+            </div>
+            <div class="card-insight">The word <em>poiema</em> — God's handiwork — is not assessed by output. A poem's value is not measured by its efficiency. It is measured by the one who wrote it and what they chose to say through it. You are not replaceable in the way you fear, because no one else occupies your exact position in God's story, at your exact moment in history, with your exact gifts, relationships, and context.</div>
+            <div class="card-practice">
+              <span class="card-practice-label">🔑 The Practice</span>
+              Write your answer to this: <em>"The good works God prepared for me look like ____."</em> Don't overthink it. Your first honest answer is usually truer than the edited version.
+            </div>
+          </div>
+          <div class="card-footer"><span class="card-tag">#Purpose #Calling</span><button class="card-flip-btn">Reflect ✦</button></div>
+        </div>
+
+        <div class="card">
+          <div class="card-inner">
+            <span class="card-level l3">🔴 Level 3 · Reflection</span>
+            <div class="card-num">🃏 Card 12 — Fear: What Are You Protecting?</div>
+            <div class="card-question">"What would you do differently if you genuinely weren't afraid?"</div>
+            <div class="card-verse">
+              "For the Spirit God gave us does not make us timid, but gives us power, love and self-discipline."
+              <div class="card-verse-ref">— 2 Timothy 1:7 (NIV)</div>
+            </div>
+            <div class="card-insight">Brown's research shows that vulnerability — which requires courage over comfort — is the birthplace of innovation, creativity, and change. It is the most accurate measurement of courage.<br><br>The Bible calls it something different: <em>power</em> (<em>dunamis</em> — the same root as "dynamite"). The antidote to fear isn't bravery in your own strength. It's recognizing whose Spirit is in you.</div>
+            <div class="card-practice">
+              <span class="card-practice-label">🔑 The Practice</span>
+              Name your fear specifically. Then ask: <em>Is this fear protecting me from something real, or from something that hasn't happened yet?</em> Real danger demands action. Imagined danger demands surrender.
+            </div>
+          </div>
+          <div class="card-footer"><span class="card-tag">#Fear #Courage</span><button class="card-flip-btn">Reflect ✦</button></div>
+        </div>
+
+        <div class="card">
+          <div class="card-inner">
+            <span class="card-level l3">🔴 Level 3 · Reflection</span>
+            <div class="card-num">🃏 Card 13 — The Truest Thing About You</div>
+            <div class="card-question">"What do you most want to be remembered for?"</div>
+            <div class="card-verse">
+              "For I know the plans I have for you, declares the Lord, plans to prosper you and not to harm you, plans to give you hope and a future."
+              <div class="card-verse-ref">— Jeremiah 29:11 (NIV)</div>
+            </div>
+            <div class="card-insight">Context matters: this verse was written to people <strong>in exile</strong> — displaced, confused, wondering if God had forgotten them. It wasn't written to comfortable people. It was written to people who had lost everything and were asking if there was still a story to live.<br><br>Meditating on what God says about your worth can remind you that you are fearfully and wonderfully made — especially on the days when you do not feel so confident.</div>
+            <div class="card-practice">
+              <span class="card-practice-label">🔑 The Practice</span>
+              Write your own eulogy. Not morbidly — honestly. What do you want to be true of your life by the end of it? Read it once a year.
+            </div>
+          </div>
+          <div class="card-footer"><span class="card-tag">#Legacy #Identity</span><button class="card-flip-btn">Reflect ✦</button></div>
+        </div>
+
+        <div class="card">
+          <div class="card-inner">
+            <span class="card-level l3">🔴 Level 3 · Reflection</span>
+            <div class="card-num">🃏 Card 14 — Suffering: The Question That Doesn't Have an Easy Answer</div>
+            <div class="card-question">"Has something happened to you that made you question whether God was good?"</div>
+            <div class="card-verse">
+              "And we know that in all things God works for the good of those who love him, who have been called according to his purpose."
+              <div class="card-verse-ref">— Romans 8:28 (NIV)</div>
+            </div>
+            <div class="card-insight">When trials come that are out of our control, we can rest on this promise. It is just like a piece of embroidery which looks a mess on the back — but when you turn it over, it is a beautiful work of art.<br><br><strong>Important caveat:</strong> This verse is not a dismissal of pain. It doesn't say <em>all things are good.</em> It says God works <em>through</em> them toward good. That's a profoundly different claim — and one that requires time, trust, and honesty about the dark.</div>
+            <div class="card-practice">
+              <span class="card-practice-label">🔑 The Practice</span>
+              Write down the hardest thing that has ever happened to you. Then ask: <em>What has it made possible in me that nothing else could have?</em> This is not toxic positivity. It's excavation.
+            </div>
+          </div>
+          <div class="card-footer"><span class="card-tag">#Suffering #Redemption</span><button class="card-flip-btn">Reflect ✦</button></div>
+        </div>
+
+        <div class="card">
+          <div class="card-inner">
+            <span class="card-level l3">🔴 Level 3 · Reflection</span>
+            <div class="card-num">🃏 Card 15 — The Final Card: What Do You Actually Believe?</div>
+            <div class="card-question">"If you had to reduce your entire belief about yourself down to one sentence — what would it be?"</div>
+            <div class="card-verse">
+              "You are a chosen people, a royal priesthood, a holy nation, God's special possession, that you may declare the praises of him who called you out of darkness into his wonderful light."
+              <div class="card-verse-ref">— 1 Peter 2:9 (NIV)</div>
+            </div>
+            <div class="card-insight">Low self-worth is not always loud. Sometimes it appears as people-pleasing, self-criticism, perfectionism, or the quiet assumption that everyone else is more solid than you. The goal is to rebuild identity from God's truth rather than from comparison, approval, or recent failure.<br><br>Brown found that "whole-hearted" people — those living from a deep sense of worthiness — had the ability to let go of who they thought they should be, in order to become who they already are.<br><br>The Bible says you were already called. Already chosen. Already held. The question is whether you'll believe it on a Tuesday afternoon when nothing feels true.</div>
+            <div class="card-practice">
+              <span class="card-practice-label">🔑 The Practice</span>
+              Write your one sentence. Then put it somewhere you'll see it when you least feel like it's true. That's when it matters most.
+            </div>
+          </div>
+          <div class="card-footer"><span class="card-tag">#Wholeness #Belief</span><button class="card-flip-btn">Reflect ✦</button></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- WILDCARD DECK -->
+<div id="panel-wild" style="display:none">
+  <div class="carousel-section">
+    <div style="padding:20px 0;margin-bottom:24px;border-bottom:2px solid var(--border)">
+      <span style="font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--accent3)">🃏 Wildcard Deck</span>
+      <h2 style="font-family:'Fraunces',serif;font-weight:900;font-size:clamp(24px,4vw,40px);margin-top:8px">Draw one randomly.<br>Do it today.</h2>
+    </div>
+    <div class="carousel-header">
+      <div class="carousel-title">7 Wildcards</div>
+      <div class="carousel-nav">
+        <button class="carousel-btn" id="wprev">←</button>
+        <span class="carousel-counter" id="wcount">1 / 7</span>
+        <button class="carousel-btn" id="wnext">→</button>
+      </div>
+    </div>
+    <div class="carousel-track-wrap">
+      <div class="carousel-track" id="wtrack"></div>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM LINE -->
+<div style="padding:60px 40px;border-top:2px solid var(--border);background:var(--surface2);position:relative;z-index:2">
+  <div style="max-width:700px;margin:0 auto;text-align:center">
+    <div style="font-size:40px;margin-bottom:16px">🏁</div>
+    <h2 style="font-family:'Fraunces',serif;font-weight:900;font-size:clamp(24px,4vw,40px);margin-bottom:20px">Bottom Line</h2>
+    <p style="font-size:15px;line-height:1.9;color:var(--ink2)">The Bible and the best human psychology agree on the same thing: <strong>you were made for deep connection — with yourself, with others, and with something larger than you.</strong> The main obstacle is the same too: <em>fear of not being enough.</em> Every card in this playbook is an invitation to step through that fear, one honest question at a time.</p>
+    <div style="margin-top:32px;display:flex;gap:16px;justify-content:center;flex-wrap:wrap">
+      <a href="audit.html" style="padding:14px 28px;background:var(--accent1);color:#fff;border-radius:100px;text-decoration:none;font-size:12px;letter-spacing:2px;text-transform:uppercase;font-family:'Space Mono',monospace">Next: The Audit →</a>
+      <a href="cards.html" style="padding:14px 28px;border:2px solid var(--border);border-radius:100px;text-decoration:none;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--ink);font-family:'Space Mono',monospace">Draw a Card</a>
+    </div>
+  </div>
+</div>
+
+<script>
+// CURSOR
+const cursor=document.getElementById('cursor'),dot=document.getElementById('cursorDot');
+let mx=0,my=0,cx=0,cy=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;dot.style.left=mx+'px';dot.style.top=my+'px'});
+(function anim(){cx+=(mx-cx)*0.15;cy+=(my-cy)*0.15;cursor.style.left=cx+'px';cursor.style.top=cy+'px';requestAnimationFrame(anim)})();
+document.querySelectorAll('a,button').forEach(el=>{el.addEventListener('mouseenter',()=>cursor.classList.add('hover'));el.addEventListener('mouseleave',()=>cursor.classList.remove('hover'))});
+
+// DARK MODE
+const dm=document.getElementById('dmToggle');
+document.documentElement.setAttribute('data-theme',localStorage.getItem('sq-theme')||'light');
+dm.onclick=()=>{const t=document.documentElement.getAttribute('data-theme')==='light'?'dark':'light';document.documentElement.setAttribute('data-theme',t);localStorage.setItem('sq-theme',t)};
+// NAV BURGER
+const burger=document.getElementById('navBurger'),mobileNav=document.getElementById('navMobile');if(burger&&mobileNav){burger.addEventListener('click',()=>{const o=mobileNav.classList.toggle('open');burger.classList.toggle('open');burger.setAttribute('aria-expanded',o)});mobileNav.querySelectorAll('.nav-link').forEach(l=>l.addEventListener('click',()=>{mobileNav.classList.remove('open');burger.classList.remove('open');burger.setAttribute('aria-expanded',false)}))}
+
+// TABS
+const tabs=document.querySelectorAll('.level-tab');
+const panels={why:'panel-why',l1:'panel-l1',l2:'panel-l2',l3:'panel-l3',wild:'panel-wild'};
+tabs.forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    tabs.forEach(t=>t.classList.remove('active'));
+    tab.classList.add('active');
+    Object.values(panels).forEach(pid=>{const p=document.getElementById(pid);if(p)p.style.display='none'});
+    const pid=panels[tab.dataset.level];
+    if(pid){const p=document.getElementById(pid);if(p)p.style.display='block'}
+    playClick();
+  });
+});
+
+// CAROUSEL FACTORY
+function makeCarousel(trackId,prevId,nextId,countId){
+  const track=document.getElementById(trackId);
+  const prev=document.getElementById(prevId);
+  const next=document.getElementById(nextId);
+  const count=document.getElementById(countId);
+  if(!track||!prev||!next)return;
+  const cards=track.querySelectorAll('.card');
+  let idx=0;
+  const total=cards.length;
+  function go(n){idx=(n+total)%total;track.style.transform=`translateX(-${idx*100}%)`;count.textContent=`${idx+1} / ${total}`;}
+  prev.onclick=()=>{go(idx-1);playClick()};
+  next.onclick=()=>{go(idx+1);playClick()};
+}
+makeCarousel('l1track','l1prev','l1next','l1count');
+makeCarousel('l2track','l2prev','l2next','l2count');
+makeCarousel('l3track','l3prev','l3next','l3count');
+
+// WILDCARDS
+const wildcards=[
+  {name:'The Mercy Card',action:'Text someone who has hurt you: "I\'m working on forgiving what happened between us." Don\'t explain. Just send it.'},
+  {name:'The Truth Card',action:'Tell someone one thing you love about them that you\'ve never said out loud.'},
+  {name:'The Confession Card',action:'Admit one thing to yourself that you\'ve been pretending isn\'t true. Write it down. Burn it. Pray it.'},
+  {name:'The Gratitude Card',action:'Name 3 things that are hard right now — then name the hidden gift in each one.'},
+  {name:'The Courage Card',action:'Do the one thing you\'ve been avoiding for months. Today. Just start.'},
+  {name:'The Rest Card',action:'Do nothing productive for one hour. Practice being, not doing. (Psalm 46:10: "Be still and know that I am God.")'},
+  {name:'The Apology Card',action:'Apologize to someone — with zero expectation of a response.'},
+];
+const wtrack=document.getElementById('wtrack');
+const wcolors=['var(--accent2)','var(--accent1)','var(--accent3)','var(--accent4)','var(--accent5)','var(--accent2)','var(--accent3)'];
+wildcards.forEach((w,i)=>{
+  const el=document.createElement('div');
+  el.className='card';
+  el.innerHTML=`<div class="card-inner"><span class="card-level lw">🃏 Wildcard Deck</span><div style="font-size:48px;margin:20px 0">✦</div><div style="font-family:'Fraunces',serif;font-weight:900;font-size:32px;line-height:1.2;margin-bottom:24px;color:var(--ink)">${w.name}</div><div style="font-size:15px;line-height:1.8;color:var(--ink2)">${w.action}</div></div><div class="card-footer"><span class="card-tag">Draw one randomly. Do it today.</span><button class="card-flip-btn" onclick="playClick()">Done ✦</button></div>`;
+  el.style.borderLeft=`6px solid ${wcolors[i]}`;
+  wtrack.appendChild(el);
+});
+makeCarousel('wtrack','wprev','wnext','wcount');
+
+// REFLECT BUTTON
+document.querySelectorAll('.card-flip-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    btn.textContent=btn.textContent==='Reflect ✦'?'Nice. 🙌':'Reflect ✦';
+    playBing();
+  });
+});
+
+// SOUNDS
+var audioCtx;
+function playClick(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.connect(g);g.connect(audioCtx.destination);o.frequency.setValueAtTime(500,audioCtx.currentTime);o.frequency.exponentialRampToValueAtTime(200,audioCtx.currentTime+0.07);g.gain.setValueAtTime(0.07,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.07);o.start();o.stop(audioCtx.currentTime+0.07)}
+function playBing(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.connect(g);g.connect(audioCtx.destination);o.type='sine';o.frequency.setValueAtTime(880,audioCtx.currentTime);o.frequency.exponentialRampToValueAtTime(1320,audioCtx.currentTime+0.1);g.gain.setValueAtTime(0.08,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.3);o.start();o.stop(audioCtx.currentTime+0.3)}
+</script>
+</body>
+</html>
